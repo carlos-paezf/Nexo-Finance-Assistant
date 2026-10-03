@@ -33,3 +33,17 @@ RF-052: dado un gasto compartido confirmado de 100.000 COP, cuando se consulta e
 RF-160: sin autorización vigente, soporte no puede obtener información financiera ampliada. Con autorización, solo accede al alcance concedido; al vencer o revocarse, se deniega un nuevo acceso y queda auditoría.
 ## Control de cambios
 Todo cambio de requisito conserva ID, fecha, motivo y estado de aprobación. Las nuevas funcionalidades continúan la numeración existente.
+
+## Cierre de cada iteración — regla confirmada el 3 de octubre de 2026
+El usuario solicita seguimiento visual de la app y un commit después de cada
+iteración. Para cambios en la app, entregar una instancia ejecutable con datos
+sintéticos, preferentemente Flutter Web para revisión visual, y emulador o
+dispositivo para capacidades nativas. Registrar plataforma, URL o comando de
+arranque, flujo revisado y verificaciones pendientes.
+
+Después de las verificaciones y actualización documental, crear un commit
+coherente conforme a [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/).
+Entregar su SHA y mensaje. Separar cambios ajenos y evitar commits vacíos.
+Las instrucciones permanentes están en AGENTS.md. Si no es posible ejecutar la
+app, registrar el bloqueo; la vista previa no se considera validada.
+

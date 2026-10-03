@@ -2,6 +2,23 @@
 
 [Fuente en Notion](https://app.notion.com/p/3eeaf67c2e9281ae981bd4ca40c4e368?pvs=204)
 
+## 3 de octubre de 2026 — Vista previa y commits por iteración
+El usuario estableció dos reglas de trabajo: revisar una instancia visual de la
+app mientras avanza y crear un commit después de cada iteración siguiendo
+Conventional Commits 1.0.0. Se incorporan a AGENTS.md y al plan de seguimiento;
+también se registran en Notion. Este incremento modifica documentación.
+
+Se consultaron la especificación oficial de Conventional Commits y la guía de
+Flutter Web. Los datos sintéticos y la plataforma de la demo deben identificarse;
+la revisión visual web y la validación nativa conservan evidencia separada.
+Este incremento documental no ejecuta una app. La PoC local mencionada en
+Notion aún necesita publicación de código y ejecución verificable.
+La conciliación de otras actualizaciones de Notion con las copias locales
+permanece pendiente. No se aprueban requisitos adicionales del MVP.
+
+Fuentes: [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/),
+[Flutter Web](https://docs.flutter.dev/platform-integration/web/building).
+
 ## 2 de octubre de 2026 — Agentes y eficiencia
 A solicitud del usuario, se añadió la política de agentes, selección de modelos y minimización del consumo total de tokens. Se verificaron los modelos y la configuración actual de Codex, la disponibilidad de Impeccable/Ponytail en esta sesión y la instalación de UI UX Pro Max documentada por su autor.
 Se prepara el paquete v1.1 con configuración de proyecto y cuatro agentes especializados. La línea base del producto sigue en v0.2: 238 requisitos. No se han medido ahorros reales ni instalado los componentes en la instancia local del usuario. [Política detallada](https://app.notion.com/p/3eeaf67c2e92814ca552db8b0a3093be).
