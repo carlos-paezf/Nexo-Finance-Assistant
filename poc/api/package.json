@@ -6,7 +6,7 @@
   "scripts": {
     "build": "prisma generate && tsc -p tsconfig.json",
     "start": "node dist/src/main.js",
-    "test": "npm run build && node --test dist/test/finance.service.spec.js",
+    "test": "npm run build && node --test dist/test/*.spec.js",
     "test:postgres": "npm run build && node --test dist/test/postgres.integration.spec.js",
     "db:deploy": "prisma migrate deploy"
   },

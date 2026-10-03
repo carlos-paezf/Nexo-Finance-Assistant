@@ -124,3 +124,46 @@ cifrado, segundo plano, captura nativa ni pruebas físicas; no usar datos reales
 T-005 sigue en progreso. Flutter/Nest/Prisma/PostgreSQL siguen preferencia, no
 aprobación productiva; versiones, validación técnica y MVP pendientes. Consumo de
 tokens de la tarea: N/D.
+
+## 3 de octubre de 2026 — T-005: ejecución y validación en Windows
+
+Preparación: SDK oficial Flutter 3.47.5/Dart 3.13.4 extraído en el área local
+ignorada `poc/.runtime`; Windows elegido porque `flutter doctor -v` reconoció
+Build Tools 2019 y `flutter devices` mostró el target Windows. Android SDK y
+dispositivo físico no disponibles. Se generó scaffold `windows/`; no se cambió
+el stack ni la migración. `integration_test` se añadió como dependencia de test
+del SDK Flutter, con entradas nuevas en `pubspec.lock`; sus versiones existentes
+permanecieron bloqueadas y `flutter pub get --enforce-lockfile` pasó.
+
+PostgreSQL 17.6 quedó en un clúster/DB dedicado a la PoC, host loopback y puerto
+55432, bajo `poc/.runtime/postgres-data`; API usa `.env` ignorado con
+`DATABASE_URL` local. Se aplicó `20261003000000_init`. `npm test` (build y todos
+los tests) pasó 5/5 con PostgreSQL real. La integración levanta NestJS en un
+proceso hijo, crea cuenta e ingreso/gasto, reintenta cada operación 10 veces,
+confirma balance de 10.765.433 centavos, reinicia el proceso, vuelve a reintentar,
+verifica las dos filas y comprueba 409 al reutilizar ID con payload distinto.
+La integración limpia la cuenta al terminar. `npm audit`: 0 vulnerabilidades.
+
+Flutter: `pub get --enforce-lockfile` pasó, `analyze` sin issues y `test` 5/5.
+`flutter test integration_test/finance_flow_test.dart -d windows` pasó 1/1 con
+la app Windows real, conectada a la API y base reales. El recorrido visual crea
+cuenta, añade ingreso/gasto, muestra COP 1.187,66, observa error con API caída,
+rehidrata cola tras recrear el árbol UI, inicia NestJS y verifica los tres ítems
+sincronizados y el saldo del servidor. El test recrea raíz/widget en el mismo
+proceso desktop, no cierra y relanza el proceso ejecutable entero. `flutter run`
+compiló Windows correctamente. La instancia normal puede levantarse con los
+comandos exactos del README de `poc/flutter_offline/`.
+
+Fallos corregidos con evidencia: analyzer encontró errores de sintaxis/typing
+que se corrigieron; 100 movimientos expusieron que cleanup podía borrar la
+revisión recién escrita por diferencias de path Windows, corregido comparando
+nombre del archivo; se corrigió expectativa de orden descendente en historial.
+La integración de UI pasó luego de esperar explícitamente la carga asíncrona y
+desplazar la lista al verificar elementos fuera del viewport.
+
+T-005 sigue en progreso: falta reinicio de proceso Flutter real, dispositivos
+físicos Android/iOS, conectores/captura nativa, permisos, privacidad/auth, cifrado,
+background, energía y rendimiento. Flutter + Nest + PostgreSQL/Prisma siguen
+preferencia, no stack productivo aprobado; MVP, versiones de producción y DEC-004
+pendientes. Datos usados fueron sintéticos; no usar la PoC con datos reales.
+Consumo total de tokens atribuible a esta tarea: N/D.

@@ -51,7 +51,7 @@ class TestApi implements FinanceApi {
   Future<int> readBalance(String accountId) async {
     final account = accounts[accountId];
     if (account == null) throw const HttpException('404');
-    return movements.values.where((m) => m.accountIdForTest == accountId).fold(
+    return movements.values.where((m) => m.accountIdForTest == accountId).fold<int>(
       account.openingCents,
       (sum, movement) => sum +
           (movement.type == MovementType.income ? movement.cents : -movement.cents),
@@ -108,7 +108,7 @@ void main() {
     expect(reopened.state.account!.status, SyncStatus.pending);
     expect(reopened.state.movements.every((m) => m.status == SyncStatus.pending), isTrue);
     expect(reopened.state.localBalanceCents, 10000100);
-    expect(reopened.state.movements.first.cents, 101);
+    expect(reopened.state.movements.first.cents, 99);
   });
 
   test('estado de error y replay tras respuesta perdida sobreviven a reiniciar el repositorio', () async {

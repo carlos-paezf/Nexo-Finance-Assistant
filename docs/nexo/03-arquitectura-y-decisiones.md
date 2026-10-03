@@ -6,7 +6,8 @@
 Borrador de diseño. Flutter, NestJS + TypeScript y PostgreSQL + Prisma son la
 preferencia tecnológica del usuario y se ejercitan en una PoC acotada. La PoC no
 aprueba versiones productivas, validación técnica completa, DEC-004 ni alcance
-del MVP.
+del MVP. T-005 obtuvo evidencia automatizada en Windows y PostgreSQL 17.6; quedan
+pendientes dispositivos físicos, captura por plataforma, seguridad y rendimiento.
 ## Organización de la solución
 - Aplicación móvil financiera para usuarios.
 - Portal web independiente para administración y soporte.

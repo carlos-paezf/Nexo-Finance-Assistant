@@ -61,20 +61,30 @@ aislado sin credenciales ni conectividad y no permite confirmar allí la carga d
 los agentes del perfil principal. Una revisión independiente con `gpt-6-sol` sí
 se completó en el cliente de esta tarea.
 
-## Seguimiento T-005 — 3 de octubre de 2026
+## Seguimiento T-005 — iteración de ejecución Windows
 
 **En progreso; no marcar como completada.** Preferencia de referencia del usuario:
-Flutter + NestJS/TypeScript + PostgreSQL/Prisma. Se implementó una API mínima y
-un cliente Flutter con almacenamiento local y cola durable para datos sintéticos.
-`npm test` pasó 4 pruebas Node de balance exacto, validación e idempotencia; el
-`npm audit` no reportó vulnerabilidades. `npm run test:postgres` compiló pero
-omitió su única prueba por no haber `DATABASE_URL`/servidor. `flutter test` no se
-pudo ejecutar: Flutter/Dart no están instalados. Sin pruebas en Android/iOS
-físicos. Evidencia detallada en [evaluación móvil](10-evaluacion-tecnologia-movil.md)
-y los README de `poc/`.
+Flutter + NestJS/TypeScript + PostgreSQL/Prisma. Flutter 3.47.5/Dart 3.13.4,
+Windows desktop con Visual Studio Build Tools 2019 y PostgreSQL 17.6 local,
+aislado en `poc/.runtime` puerto 55432. No se habilitó Android; doctor no encontró
+Android SDK ni dispositivo Android conectado.
 
-El código de Flutter comprueba recuperación/reintentos solo cuando sus pruebas
-se ejecuten; no atribuir esos criterios como validados todavía. Faltan validar
-persistencia e idempotencia reales en PostgreSQL, ejecución Flutter, dispositivos,
-seguridad/cifrado, capturas por plataforma, energía y rendimiento. T-005 sigue
-abierta; versiones productivas, DEC-004 y aprobación de MVP pendientes.
+Evidencia ejecutada: `flutter pub get --enforce-lockfile` conservó lockfile base
+y agregó `integration_test`; `flutter analyze` sin issues; `flutter test` pasó
+5/5. `npm run db:deploy` aplicó la migración existente; `npm test` con
+`DATABASE_URL` real pasó 5/5, incluyendo HTTP a NestJS que reinicia el proceso,
+valida COP 107.654,33, 10 replays por operación, 409 ante contenido distinto y
+dos movimientos persistidos. `flutter test integration_test/finance_flow_test.dart
+-d windows ...` pasó 1/1 en la app Windows real: alta, ingreso, gasto, saldo,
+error offline, rehidratación al recrear el árbol de app, API disponible y cola
+sincronizada. Se corrigió el borrado accidental de la revisión local actual al
+comparar rutas Windows por nombre; el analyzer encontró y corrigió tres errores
+de compilación/typing antes de pasar.
+
+La ejecución de la integración de UI recrea la app y el repositorio en el mismo
+proceso; no prueba relanzar el ejecutable Windows completo. Falta validar ese
+ciclo real, dispositivos físicos Android/iOS, captura nativa, permisos, seguridad
+con cifrado/auth, segundo plano, energía y rendimiento. T-005 sigue abierta;
+versiones productivas, DEC-004, validación completa y aprobación del MVP pendientes.
+Comandos reproducibles en los README de [`poc/api`](../../poc/api/README.md) y
+[`poc/flutter_offline`](../../poc/flutter_offline/README.md).

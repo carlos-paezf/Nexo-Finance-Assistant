@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -10,7 +11,11 @@ import 'money.dart';
 void main() => runApp(const NexoPocApp());
 
 class NexoPocApp extends StatelessWidget {
-  const NexoPocApp({super.key});
+  const NexoPocApp({super.key, this.apiBaseUrl, this.supportDirectoryProvider, this.idProvider});
+
+  final String? apiBaseUrl;
+  final Future<Directory> Function()? supportDirectoryProvider;
+  final String Function()? idProvider;
 
   @override
   Widget build(BuildContext context) => MaterialApp(
@@ -26,12 +31,20 @@ class NexoPocApp extends StatelessWidget {
             border: OutlineInputBorder(),
           ),
         ),
-        home: const LedgerPage(),
+        home: LedgerPage(
+          apiBaseUrl: apiBaseUrl,
+          supportDirectoryProvider: supportDirectoryProvider,
+          idProvider: idProvider,
+        ),
       );
 }
 
 class LedgerPage extends StatefulWidget {
-  const LedgerPage({super.key});
+  const LedgerPage({super.key, this.apiBaseUrl, this.supportDirectoryProvider, this.idProvider});
+
+  final String? apiBaseUrl;
+  final Future<Directory> Function()? supportDirectoryProvider;
+  final String Function()? idProvider;
 
   @override
   State<LedgerPage> createState() => _LedgerPageState();
@@ -45,11 +58,11 @@ class _LedgerPageState extends State<LedgerPage> {
   final _amount = TextEditingController();
   final _random = Random.secure();
   late final HttpFinanceApi _api = HttpFinanceApi(
-    const String.fromEnvironment(
-      'NEXO_API_URL',
-      defaultValue: 'http://127.0.0.1:3000',
-    ),
+    widget.apiBaseUrl ??
+        const String.fromEnvironment('NEXO_API_URL', defaultValue: 'http://127.0.0.1:3000'),
   );
+  late final Future<Directory> Function() _supportDirectory =
+      widget.supportDirectoryProvider ?? getApplicationSupportDirectory;
   NexoRepository? _repository;
   MovementType _type = MovementType.expense;
   bool _busy = true;
@@ -63,7 +76,7 @@ class _LedgerPageState extends State<LedgerPage> {
 
   Future<void> _open() async {
     try {
-      final directory = await getApplicationSupportDirectory();
+      final directory = await _supportDirectory();
       final repository = NexoRepository(
         LocalStore('${directory.path}/nexo_offline_poc.json'),
         _api,
@@ -112,7 +125,7 @@ class _LedgerPageState extends State<LedgerPage> {
     }
   }
 
-  String _newId() =>
+  String _newId() => widget.idProvider?.call() ??
       '${DateTime.now().toUtc().microsecondsSinceEpoch}-${_random.nextInt(1 << 32)}';
 
   Future<bool> _run(Future<void> Function() action) async {
@@ -148,7 +161,9 @@ class _LedgerPageState extends State<LedgerPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Nexo · prueba sin conexión')),
       body: _busy && repository == null
-          ? const Center(child: CircularProgressIndicator semanticsLabel: 'Abriendo cuenta')
+          ? const Center(
+              child: CircularProgressIndicator(semanticsLabel: 'Abriendo cuenta'),
+            )
           : _loadError != null
               ? Center(child: Text(_loadError!))
               : SafeArea(

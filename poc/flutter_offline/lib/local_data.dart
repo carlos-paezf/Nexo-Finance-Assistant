@@ -157,6 +157,13 @@ class LocalStore {
   final String filePath;
   File get _file => File(filePath);
 
+  bool _isRevision(File candidate, String base) {
+    final name = candidate.uri.pathSegments.last;
+    final prefix = '$base.r';
+    if (!name.startsWith(prefix) || !name.endsWith('.json')) return false;
+    return int.tryParse(name.substring(prefix.length, name.length - 5)) != null;
+  }
+
   Future<Snapshot> read() async {
     final parent = _file.parent;
     if (!await parent.exists()) return const Snapshot();
@@ -164,9 +171,7 @@ class LocalStore {
     final candidates = <File>[];
     await for (final entry in parent.list()) {
       if (entry is File &&
-          (entry.path == filePath ||
-              RegExp('^${RegExp.escape(base)}\\.r[0-9]+\\.json$')
-                  .hasMatch(entry.uri.pathSegments.last))) {
+          (entry.path == filePath || _isRevision(entry, base))) {
         candidates.add(entry);
       }
     }
@@ -191,9 +196,8 @@ class LocalStore {
     final base = file.uri.pathSegments.last;
     await for (final entry in file.parent.list()) {
       if (entry is File &&
-          entry.path != destination.path &&
-          RegExp('^${RegExp.escape(base)}\\.r[0-9]+\\.json$')
-              .hasMatch(entry.uri.pathSegments.last)) {
+          entry.uri.pathSegments.last != destination.uri.pathSegments.last &&
+          _isRevision(entry, base)) {
         try {
           await entry.delete();
         } on FileSystemException {

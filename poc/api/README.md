@@ -5,8 +5,8 @@ API sin autenticación para datos sintéticos. No exponer a Internet ni usar con
 ## Requisitos y versiones de esta PoC
 
 - Node `22.15.0` del entorno: compatible con NestJS `12.1.2` (Node >=20) y Prisma ORM `7.10.0` (Node `^20.19 || ^22.12 || >=24`).
-- TypeScript `5.9.3`; PostgreSQL `18` en Compose. Prisma documenta soporte para PostgreSQL 18.
-- Cliente móvil: Flutter SDK pendiente de instalación/verificación; `path_provider` `2.1.6` declara soporte Android e iOS.
+- TypeScript `5.9.3`; Compose ofrece PostgreSQL `18`. La validación ejecutada usó PostgreSQL `17.6` en un clúster local aislado, compatible con Prisma.
+- Cliente móvil: Flutter `3.47.5`, Dart `3.13.4`; Windows desktop seleccionado. `path_provider` `2.1.6` quedó bloqueado en `pubspec.lock`.
 - Las versiones fijadas son para reproducir esta PoC; versiones de producción y aprobación de DEC-004 siguen pendientes.
 
 ## Comandos
@@ -22,7 +22,7 @@ npm test
 npm start
 ```
 
-`npm test` ejecuta pruebas de servicio sin base y omite la integración PostgreSQL cuando falta `DATABASE_URL`. Para probar persistencia tras recrear el cliente Prisma, deja la base levantada y ejecuta `npm run test:postgres` (requiere migración aplicada). La conexión local del ejemplo solo es para desarrollo.
+`npm test` compila y ejecuta pruebas de servicio más la integración HTTP/PostgreSQL. La integración se omite si falta `DATABASE_URL`; con base disponible levanta y reinicia un proceso NestJS, verifica reintentos, saldo y conflicto, y limpia la cuenta sintética. `npm run test:postgres` ejecuta solo esa integración. La conexión local del ejemplo solo es para desarrollo.
 
 ## Contrato
 
@@ -31,4 +31,4 @@ npm start
 - `GET /accounts/:id`: detalle, movimientos y `balanceCents`.
 - Los IDs estables son las claves únicas. Payload repetido devuelve el registro original; misma clave con distinto contenido devuelve HTTP 409. Importes viajan como strings de centavos y se guardan como PostgreSQL `BIGINT`/`BigInt`.
 
-Este alcance no implementa usuarios, autorización, permisos por recurso, transferencias ni acuerdos compartidos. La prueba de idempotencia respaldada por PostgreSQL requiere correr la integración; las pruebas en memoria no la sustituyen.
+Este alcance no implementa usuarios, autorización, permisos por recurso, transferencias ni acuerdos compartidos. La integración probada fue en PostgreSQL local dedicado a la PoC; no usar datos reales.
