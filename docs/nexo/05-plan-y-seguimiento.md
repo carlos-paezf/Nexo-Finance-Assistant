@@ -88,3 +88,6 @@ con cifrado/auth, segundo plano, energía y rendimiento. T-005 sigue abierta;
 versiones productivas, DEC-004, validación completa y aprobación del MVP pendientes.
 Comandos reproducibles en los README de [`poc/api`](../../poc/api/README.md) y
 [`poc/flutter_offline`](../../poc/flutter_offline/README.md).
+Implementación y documentación publicadas en la rama
+[`feat/t005-runtime-validation`](https://github.com/carlos-paezf/Nexo-Finance-Assistant/tree/feat/t005-runtime-validation),
+commit `eb12ebea0615a33f4a0e09bb3781c86c03fb0c14`.

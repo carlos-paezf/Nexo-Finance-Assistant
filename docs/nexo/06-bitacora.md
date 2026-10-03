@@ -167,3 +167,8 @@ background, energía y rendimiento. Flutter + Nest + PostgreSQL/Prisma siguen
 preferencia, no stack productivo aprobado; MVP, versiones de producción y DEC-004
 pendientes. Datos usados fueron sintéticos; no usar la PoC con datos reales.
 Consumo total de tokens atribuible a esta tarea: N/D.
+
+Rama publicada para revisión: [feat/t005-runtime-validation](https://github.com/carlos-paezf/Nexo-Finance-Assistant/tree/feat/t005-runtime-validation).
+Commit de implementación/documentación: `eb12ebea0615a33f4a0e09bb3781c86c03fb0c14` —
+`test(poc): validate offline flow on Windows`. La rama quedó configurada para
+seguir `origin/feat/t005-runtime-validation`; no se abrió PR.
