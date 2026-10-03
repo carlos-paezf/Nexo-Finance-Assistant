@@ -1,0 +1,10 @@
+# Nexo: configuración inicial eficiente. Combinar con la configuración existente.
+# Requiere un cliente actual, un proyecto de confianza y acceso a los modelos.
+model = "gpt-6-luna"
+model_reasoning_effort = "high"
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 2
+default_subagent_model = "gpt-6-luna"
+default_subagent_reasoning_effort = "high"

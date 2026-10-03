@@ -1,0 +1,82 @@
+{
+  "project": "Nexo",
+  "baseline": "v0.2",
+  "functional_requirements": 163,
+  "nonfunctional_requirements": 75,
+  "exported_at": "2026-10-03T04:47:44.586370+00:00",
+  "source_project": "https://app.notion.com/p/3eeaf67c2e928135b4c6dd1d41f06290",
+  "documents": [
+    {
+      "file": "docs/nexo/01-requisitos-funcionales.md",
+      "title": "01 — Requisitos funcionales (163)",
+      "url": "https://app.notion.com/p/3eeaf67c2e92814ba10ac103f880c628?pvs=204",
+      "source_last_edited_at": "2026-10-03T03:27:31.440Z",
+      "source_truncated": false,
+      "unknown_block_count": 0
+    },
+    {
+      "file": "docs/nexo/02-requisitos-no-funcionales.md",
+      "title": "02 — Requisitos no funcionales (75)",
+      "url": "https://app.notion.com/p/3eeaf67c2e9281ca8195c8068aa11e0d?pvs=204",
+      "source_last_edited_at": "2026-10-03T03:28:19.308Z",
+      "source_truncated": false,
+      "unknown_block_count": 0
+    },
+    {
+      "file": "docs/nexo/04-reglas-de-negocio.md",
+      "title": "04 — Reglas de negocio y privacidad",
+      "url": "https://app.notion.com/p/3eeaf67c2e92815b9783dcec6bee4ade?pvs=204",
+      "source_last_edited_at": "2026-10-03T03:29:34.501Z",
+      "source_truncated": false,
+      "unknown_block_count": 0
+    },
+    {
+      "file": "docs/nexo/05-plan-y-seguimiento.md",
+      "title": "05 — Plan inicial y seguimiento",
+      "url": "https://app.notion.com/p/3eeaf67c2e928101b31dfe0100cbb4d6?pvs=204",
+      "source_last_edited_at": "2026-10-03T03:29:34.501Z",
+      "source_truncated": false,
+      "unknown_block_count": 0
+    },
+    {
+      "file": "docs/nexo/03-arquitectura-y-decisiones.md",
+      "title": "03 — Arquitectura y decisiones",
+      "url": "https://app.notion.com/p/3eeaf67c2e92810da2ceeb9eddf4c898?pvs=204",
+      "source_last_edited_at": "2026-10-03T04:44:59.441Z",
+      "source_truncated": false,
+      "unknown_block_count": 0
+    },
+    {
+      "file": "docs/nexo/06-bitacora.md",
+      "title": "06 — Bitácora y fuentes",
+      "url": "https://app.notion.com/p/3eeaf67c2e9281ae981bd4ca40c4e368?pvs=204",
+      "source_last_edited_at": "2026-10-03T04:45:05.226Z",
+      "source_truncated": false,
+      "unknown_block_count": 0
+    },
+    {
+      "file": "docs/nexo/07-configurar-codex.md",
+      "title": "🛠️ 07 — Configurar Codex para Nexo",
+      "url": "https://app.notion.com/p/3eeaf67c2e9281a69455e5410c500fb1?pvs=204",
+      "source_last_edited_at": "2026-10-03T04:45:10.452Z",
+      "source_truncated": false,
+      "unknown_block_count": 0
+    },
+    {
+      "file": "docs/nexo/08-agentes-modelos-y-tokens.md",
+      "title": "⚙️ 08 — Agentes, modelos y eficiencia de tokens",
+      "url": "https://app.notion.com/p/3eeaf67c2e92814ca552db8b0a3093be?pvs=204",
+      "source_last_edited_at": "2026-10-03T04:43:40.718Z",
+      "source_truncated": false,
+      "unknown_block_count": 0
+    }
+  ],
+  "package_version": "1.1",
+  "work_policy_version": "1.0",
+  "validation": {
+    "toml_syntax": "passed",
+    "requirements_preserved": "passed",
+    "live_codex_client": "not_available",
+    "ui_ux_pro_max_installation_in_user_project": "pending"
+  }
+}
