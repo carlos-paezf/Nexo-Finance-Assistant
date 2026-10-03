@@ -1,0 +1,19 @@
+name: nexo_offline_poc
+description: PoC offline con datos sintéticos para T-005 de Nexo.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  path_provider: ^2.1.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

@@ -3,7 +3,10 @@
 [Fuente en Notion](https://app.notion.com/p/3eeaf67c2e92810da2ceeb9eddf4c898?pvs=204)
 
 ## Estado
-Borrador de diseño. Las propuestas técnicas no están aprobadas ni implementadas.
+Borrador de diseño. Flutter, NestJS + TypeScript y PostgreSQL + Prisma son la
+preferencia tecnológica del usuario y se ejercitan en una PoC acotada. La PoC no
+aprueba versiones productivas, validación técnica completa, DEC-004 ni alcance
+del MVP.
 ## Organización de la solución
 - Aplicación móvil financiera para usuarios.
 - Portal web independiente para administración y soporte.
@@ -11,9 +14,9 @@ Borrador de diseño. Las propuestas técnicas no están aprobadas ni implementad
 - Motor financiero determinístico independiente de la generación de texto con IA.
 - Conectores desacoplados para captura, OCR, correo y fuentes de productos.
 ## Tecnologías propuestas
-- Móvil: Ionic + Angular o Flutter; pendiente de selección.
-- Backend: NestJS + TypeScript; propuesta.
-- Persistencia: PostgreSQL + Prisma; propuesta.
+- Móvil: Flutter, preferencia del usuario; selección productiva pendiente.
+- Backend: NestJS + TypeScript, preferencia del usuario; validación pendiente.
+- Persistencia: PostgreSQL + Prisma, preferencia del usuario; validación pendiente.
 - Colaboración: Household, Membership y permisos granulares; propuesta de modelo.
 - Mercado financiero: condiciones y tasas versionadas, con fuentes verificables.
 ## Registro de decisiones
@@ -24,7 +27,7 @@ Estado: confirmado por el usuario. Comparar tasas y condiciones, estimar benefic
 ### DEC-003 — Administración y soporte
 Estado: necesidad confirmada por el usuario. Portal administrativo, ayuda al usuario y centro de errores. Diseño web independiente y controles específicos: propuesta de línea base. Referencias: RF-145 a RF-163; RNF-067 a RNF-075.
 ### DEC-004 — Selección tecnológica
-Estado: pendiente. Comparar alternativas móviles por experiencia del equipo, soporte offline y conectores nativos. No se ha seleccionado una opción.
+Estado: preferencia tecnológica declarada por el usuario el 3 de octubre de 2026: Flutter, NestJS + TypeScript y PostgreSQL + Prisma. La PoC T-005 usa esta combinación con versiones acotadas, sin seleccionar stack de producción. Siguen pendientes versiones productivas, validación técnica, conectores, seguridad, experiencia de equipo y aprobación del MVP. Esta preferencia no aprueba reglas financieras propuestas.
 ### DEC-005 — Eficiencia en el desarrollo con Codex
 Estado: principio confirmado por solicitud del usuario; enrutamiento inicial aplicado al paquete de configuración, ajustable por evidencia. Minimizar tokens totales de tareas aceptadas sin reducir calidad, seguridad o rendimiento de la app. Agente principal Luna; especialistas bajo demanda y escalamiento a Sol para cambios críticos. Máximo dos subagentes simultáneos además del principal. Usar Ponytail, Impeccable y capacidades pertinentes; comprobar instalaciones en el proyecto local. [Política de agentes y modelos](https://app.notion.com/p/3eeaf67c2e92814ca552db8b0a3093be).
 ## Plantilla de decisión futura

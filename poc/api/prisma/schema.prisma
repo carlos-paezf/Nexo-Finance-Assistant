@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MovementType {
+  INCOME
+  EXPENSE
+}
+
+model Account {
+  id            String     @id @db.VarChar(80)
+  name          String     @db.VarChar(80)
+  openingCents  BigInt
+  requestHash   String     @db.Char(64)
+  createdAt     DateTime   @default(now()) @db.Timestamptz(3)
+  movements     Movement[]
+}
+
+model Movement {
+  id           String       @id @db.VarChar(80)
+  accountId    String       @db.VarChar(80)
+  account      Account      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  type         MovementType
+  description  String       @db.VarChar(200)
+  amountCents  BigInt
+  occurredAt   DateTime     @db.Timestamptz(3)
+  requestHash  String       @db.Char(64)
+  createdAt    DateTime     @default(now()) @db.Timestamptz(3)
+
+  @@index([accountId, occurredAt])
+}

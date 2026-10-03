@@ -107,5 +107,5 @@ Notion: [principal](https://app.notion.com/p/3eeaf67c2e928135b4c6dd1d41f06290), 
 
 Comparación automática: las 238 filas de requisitos coinciden en ID, texto y prioridad cuando existe; el cuerpo de arquitectura, reglas y plan coincide tras normalizar saltos de línea. Fechas de edición de las páginas 01 a 06 coinciden con MANIFIESTO.json (2026-10-03 UTC, aún 2 de octubre en Bogotá). La lectura del conector no informó campos de truncamiento/bloques desconocidos; no se interpreta su omisión como certificación. Se recuperaron ambos catálogos completos por conteo de filas.
 
-La página 07 es configuración, no un séptimo catálogo. Se enlaza desde el índice sin copiar instrucciones externas. Los documentos 08 a 10 son borradores locales nuevos; Notion se consultó y no se modificó. Publicarlos allí y conciliar cambios locales queda pendiente si se solicita mantener ambas copias.
+La página 07 es configuración, no un séptimo catálogo. Se enlaza desde el índice sin copiar instrucciones externas. Los documentos 08 a 10 son borradores locales; sus resúmenes se publicaron en Notion el 3 de octubre. La página de MVP es https://app.notion.com/p/3eeaf67c2e92813aba56cfcb45d9032b. Los detalles de criterios y evaluación móvil se enlazan en el índice. Conciliar cambios futuros queda pendiente.
 

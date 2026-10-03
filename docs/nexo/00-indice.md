@@ -15,6 +15,9 @@ Etapa: levantamiento y especificación inicial. No hay MVP o tecnologías aproba
 | [04-reglas-de-negocio.md](04-reglas-de-negocio.md) | 04 — Reglas de negocio y privacidad | [Notion](https://app.notion.com/p/3eeaf67c2e92815b9783dcec6bee4ade?pvs=204) |
 | [05-plan-y-seguimiento.md](05-plan-y-seguimiento.md) | 05 — Plan inicial y seguimiento | [Notion](https://app.notion.com/p/3eeaf67c2e928101b31dfe0100cbb4d6?pvs=204) |
 | [06-bitacora.md](06-bitacora.md) | 06 — Bitácora y fuentes | [Notion](https://app.notion.com/p/3eeaf67c2e9281ae981bd4ca40c4e368?pvs=204) |
+| [08-propuesta-mvp-y-depuracion.md](08-propuesta-mvp-y-depuracion.md) | Borrador T-001/T-002: cobertura RF y decisiones | [Resumen en Notion](https://app.notion.com/p/3eeaf67c2e92813aba56cfcb45d9032b) |
+| [09-primer-incremento-y-validacion.md](09-primer-incremento-y-validacion.md) | Aceptación futura para I1 e I2 | [Resumen en Notion](https://app.notion.com/p/3eeaf67c2e9281a4b0a2d95048294864) |
+| [10-evaluacion-tecnologia-movil.md](10-evaluacion-tecnologia-movil.md) | Comparación móvil y plan de PoC | [Resumen en Notion](https://app.notion.com/p/3eeaf67c2e928192a41ae2675e247371) |
 
 ## Estado para arrancar
 - Confirmados: aprendizaje de recomendaciones, explorador de ahorro/inversión y
@@ -23,6 +26,7 @@ Etapa: levantamiento y especificación inicial. No hay MVP o tecnologías aproba
 - Pendientes: depurar RF-007/RF-139, resolver la prioridad del cierre de tickets
   RF-152 y completar métricas no funcionales.
 - Primer trabajo sugerido: T-001 y T-002, propuesta de alcance y depuración del catálogo.
+- La sesión actual tiene Ponytail, Impeccable y UI UX Pro Max. Esta última está instalada globalmente en el perfil; no se duplicó en el proyecto.
 
 ## Uso de esta copia
 Consulta solo los módulos relevantes para cada tarea. Contrasta con Notion cuando

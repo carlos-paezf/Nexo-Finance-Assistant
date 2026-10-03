@@ -2,12 +2,18 @@
 
 ## Contexto
 App de finanzas personales/en pareja, evolución familiar y portal de soporte.
-Línea base v0.2: 163 RF + 75 RNF. MVP y tecnologías siguen pendientes.
+Línea base v0.2: 163 RF + 75 RNF. El usuario prefiere Flutter, NestJS con
+TypeScript y PostgreSQL con Prisma como stack de referencia. MVP y selección
+productiva siguen pendientes.
 Notion: https://app.notion.com/p/3eeaf67c2e928135b4c6dd1d41f06290
 Lee docs/nexo/00-indice.md; abre solo los RF/RNF, reglas y decisiones afectados.
 Contrasta fuentes vigentes en Notion si está disponible; informa pendientes de
 sincronización sin afirmar lecturas o escrituras que no ocurrieron.
 Conserva los ID y separa decisiones confirmadas, propuestas y pendientes.
+La preferencia tecnológica no significa aprobación de DEC-004, versiones
+productivas, validación técnica completa ni alcance del MVP. Usa las versiones
+de `poc/` solo para reproducir experimentos y registra evidencia, límites y
+pendientes antes de recomendar una decisión.
 
 ## Modelos, agentes y tokens
 - Principal: gpt-6-luna high para tareas claras. Política ampliada:
@@ -33,6 +39,9 @@ Conserva los ID y separa decisiones confirmadas, propuestas y pendientes.
 ## Implementación y skills
 - Español, cambios pequeños y soluciones simples. Inspecciona el flujo y
   consumidores antes de editar; descubre comandos en el repositorio.
+- Aplica la política de modelos/tokens de `docs/nexo/08-agentes-modelos-y-tokens.md`.
+  Dinero, sincronización, idempotencia, permisos y migraciones requieren Sol
+  desde el inicio y revisión independiente cuando aplique.
 - Usa Ponytail full cuando esté disponible para decisiones de implementación.
   Conserva validación, manejo de errores, privacidad y accesibilidad.
 - Usa Impeccable para UX/UI; consulta solo el playbook pertinente.

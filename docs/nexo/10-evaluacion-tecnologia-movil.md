@@ -5,11 +5,11 @@ Requisitos: RF-016, RF-018, RF-026 a RF-038; RNF-006, RNF-018, RNF-020 a RNF-025
 
 ## Recomendación
 
-Usar **Flutter como primera candidata para la prueba de concepto** del núcleo móvil offline y los adaptadores nativos de captura Android. Es una recomendación de evaluación: la documentación oficial ofrece patrones de datos locales/remotos y canales hacia código de plataforma. No prueba que sea más rápido, barato o seguro que Ionic.
+Usar **Flutter como candidata para la prueba de concepto** del núcleo móvil offline y los adaptadores nativos de captura Android, conforme a la preferencia tecnológica registrada en Notion el 3 de octubre de 2026. La selección definitiva de móvil sigue pendiente en DEC-004. La documentación oficial ofrece patrones de datos locales/remotos y canales hacia código de plataforma; no prueba que sea más rápido, barato o seguro que Ionic.
 
 Si el equipo ya domina Angular/TypeScript y puede mantener adaptadores Kotlin/Swift, **Ionic + Angular + Capacitor** es una alternativa igualmente viable que puede reducir aprendizaje. No se conoce la experiencia del equipo ni se han medido tiempos. El portal web independiente no obliga a compartir framework con móvil.
 
-No se ha elegido versión, plugin de base de datos, backend o proveedor. No se instalan dependencias en esta tarea.
+La preferencia de stack registrada en Notion es Flutter, NestJS + TypeScript y PostgreSQL + Prisma. No se aprobaron versiones, dependencias productivas, backend ni base de datos; esta PoC no los valida.
 
 ## Comparación basada en requisitos
 
@@ -19,7 +19,7 @@ No se ha elegido versión, plugin de base de datos, backend o proveedor. No se i
 | Captura Android: RF-027/RF-028 | Canales de plataforma conectan Dart con código Android/iOS [F2]. | Plugins Android integran SDKs desde Java/Kotlin [C1]. | Ambos pueden envolver el mismo servicio nativo; ninguno garantiza acceso a contenido bancario. |
 | Segundo plano: RNF-018/RNF-020 | Procesos en segundo plano mediante isolates y mecanismos de plataforma [F3]. | Background Runner documenta límites del sistema y frecuencia no garantizada [C2]. | Sincronizar al abrir/reanudar y recuperar conectividad; no prometer captura ni sincronización continua. |
 | Datos sensibles: RNF-002/RNF-006 | Elegir almacenamiento protegido y validar plugins. | Igual requisito; no asumir que preferencias o almacenamiento web basten para datos financieros. | Exigir PoC de persistencia, cierre de sesión y aislamiento entre usuarios. |
-| Equipo y portal | Añade Dart si el equipo no lo conoce; el portal mantiene decisión propia. | Posible reutilización de conocimientos TypeScript/Angular si existen. | Inferencia de coste de mantenimiento, no evidencia medida. Confirmar experiencia antes de decidir. |
+| Equipo y portal | Añade Dart si el equipo no lo conoce; el portal mantiene decisión propia. | Posible reutilización de conocimientos TypeScript/Angular si existen. | Preferencia Flutter anotada en Notion; experiencia del equipo y coste de mantenimiento siguen sin medirse. |
 | Android/iOS: RNF-057/RNF-061 | Sujeto a permisos y APIs nativas. | Sujeto a los mismos permisos y APIs nativas. | El framework no elimina diferencias de capacidad entre plataformas. |
 
 [F1] [Flutter: Offline-first support](https://docs.flutter.dev/app-architecture/design-patterns/offline-first).
@@ -73,5 +73,15 @@ Usar datos sintéticos y un Android físico y un iPhone físico; registrar versi
 
 Comenzar con Flutter si no hay preferencia técnica informada; contrastar Ionic si hay experiencia web existente o la PoC revela coste excesivo. Elegir según requisitos críticos superados y coste real de mantener almacenamiento/conectores, no por una puntuación inventada. Si ningún candidato cumple, revisar la arquitectura o el alcance antes de aprobar DEC-004.
 
-**Estado:** investigación documental realizada; ninguna PoC, prueba de rendimiento ni validación con bancos ejecutada.
+## Resultado parcial de T-005 — 3 de octubre de 2026
+
+La preferencia tecnológica del usuario es Flutter + NestJS/TypeScript + PostgreSQL/Prisma. La PoC en `poc/` ejercita el flujo sintético cuenta/movimientos: el cliente Flutter mantiene operaciones locales con centavos exactos, cola durable y sincronización HTTP; NestJS expone alta, registro y consulta de saldo con claves idempotentes; Prisma define migración PostgreSQL y persistencia en `BIGINT`. UI calmada, controles legibles y estados textualizados. Solo runtime Flutter `path_provider`; backend versiones de reproducción en su `package.json` y lockfile.
+
+**Verificación ejecutada en Windows:** Node 22.15.0/npm 10.9.2. `npm test` compiló Prisma Client 7.10.0 y TypeScript y pasó 4 pruebas Node: saldo COP exacto, diez repeticiones sin duplicar, conflicto 409 por mismo ID/diferente payload, y rechazo de decimal/desbordamiento. `npm audit` y `npm audit --omit=dev` reportaron 0 vulnerabilidades después de actualizar overrides transitivos. `npm run test:postgres` compiló y reportó 1 prueba omitida por falta de `DATABASE_URL`/servidor; Docker daemon no está disponible. Por ello no se probó la idempotencia real de Postgres ni reinicio del proceso backend.
+
+`flutter test` se intentó desde `poc/flutter_offline/` y falló porque el comando Flutter no se reconoce; tampoco están instalados Flutter/Dart. Las pruebas Dart para 100 movimientos, reapertura local y reintento tras respuesta perdida existen, pero **no están ejecutadas**. No se generaron proyectos de plataforma, ni se hizo validación en dispositivos físicos Android o iOS. `git diff --check` se ejecutó; reporta solo advertencias de conversión de fin de línea CRLF en archivos de documentación.
+
+Los requisitos de referencia son RF-052/CA-I1-02 para exactitud aritmética; RF-016 y RF-018 para consulta/registro y disponibilidad como cobertura parcial de UX; RNF-022 a RNF-025 para persistencia offline/sincronización; y RNF-020/RNF-021 para interfaz/accesibilidad. Sin ejecución Flutter y DB, la cobertura runtime de estos criterios queda pendiente. Los requisitos de autorización (CA-I1-07/11, CA-I2-06), conflictos concurrentes, seguridad cifrada, privacidad por usuario, sincronización en segundo plano, captura por plataforma, energía, rendimiento y prueba física no están cubiertos por la PoC.
+
+**Recomendación:** continuar esta ruta para completar T-005: ejecutar tests Flutter y la integración con PostgreSQL, luego Android/iOS físicos. La evidencia disponible favorece construir sobre la preferencia informada, pues Nest compila con Node 22.15 y las pruebas unitarias de dominio pasan; no compara costo de equipo ni valida runtime/DB/móvil. Versiones fijadas son solo reproducibles para este prototipo, no productivas. DEC-004, validación técnica completa, MVP y decisiones productivas continúan pendientes. Sin autenticación, cifrado local o permisos; no usar datos reales.
 
