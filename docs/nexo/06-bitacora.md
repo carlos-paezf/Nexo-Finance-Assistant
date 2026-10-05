@@ -404,3 +404,37 @@ Alcance: esta ejecución valida Windows y PostgreSQL local; no acredita Android.
 La política PAREJA/FAMILIA mantiene solo cobertura unitaria parcial; no se han
 validado persistencia, atomicidad, replay ni autorización HTTP de grupos. T-005
 permanece en progreso.
+
+## 5 de octubre de 2026 — persistencia experimental PAREJA/FAMILIA
+
+Se añadió la migración aditiva `20261005000000_group_mode` al PostgreSQL 17.6
+dedicado a la PoC; `Account`, `Movement` y la migración previa se conservaron.
+`Group` mantiene ID, modo y revisión BIGINT acotada al entero seguro; las
+membresías guardan estado y `canChangeMode`; `GroupModeOperation` guarda clave,
+hash canónico y resultado. La función interna consulta membresía/permisos desde
+PostgreSQL, bloquea el grupo y aplica tipo/revisión junto al recibo en una
+transacción. El recibo repetido se consulta tras revalidar el permiso y antes de
+rechazar una revisión ya obsoleta.
+
+`npm test` pasó 29/29 sin skips con PostgreSQL real. Los once escenarios nuevos
+verificaron las dos conversiones, bloqueo con tres activos, actores y permisos,
+revisiones y no-op, membresías sin alteración, diez repeticiones y reconexión,
+conflicto por contenido, revocación antes del replay, dos formas de concurrencia
+y rollback. El fallo se indujo desde el test mediante un trigger PostgreSQL
+temporal que rechaza el INSERT del recibo; se retiró en `finally` y el estado
+quedó intacto. Revisión independiente Sol: sin defectos bloqueantes.
+
+La ventana financiera Windows PID 95952 y API PID 94168 en
+`http://127.0.0.1:3011` se conservaron activas; datos sintéticos en
+`D:\Nexus\poc\.runtime\t005-runtime-recovery-20261005-6f3a`. Esta instancia no
+incluye UI de grupos. El harness Flutter administra su propia API y necesita
+3011 libre: ejecutar la integración primero y abrir después la API persistente y
+la instancia Windows. Comando visual vigente desde `poc/flutter_offline`:
+`& '.\build\windows\x64\runner\Release\nexo_offline_poc.exe'`.
+
+Alcance aún parcial: no hay autorización HTTP ni usuarios reales, invitaciones,
+replay de cola de grupos ni integración/preservación de movimientos y acuerdos
+históricos compartidos. La prueba de permiso revocado es secuencial; no se hizo
+un intercalado controlado de revocación concurrente, aunque la lectura bloqueada
+de membresía la serializa frente al cambio. No se valida Android ni cumplimiento
+de T-005 completo.

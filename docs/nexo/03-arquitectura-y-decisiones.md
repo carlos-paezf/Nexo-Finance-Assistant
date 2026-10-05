@@ -74,3 +74,26 @@ idempotencia de extremo a extremo. El backend debe autorizar cada lectura y
 escritura por actor, grupo, recurso, acción y permiso vigente. Las reglas de
 producción, cardinalidad familiar y tratamiento de históricos de miembros
 salientes siguen pendientes de aprobación.
+
+### Evidencia de persistencia experimental — 5 de octubre de 2026
+
+La PoC añade `Group`, `GroupMembership` y `GroupModeOperation` mediante una
+migración aditiva sobre el clúster sintético PostgreSQL existente. La función
+interna `GroupModePersistence.change` revalida membresía y permiso desde la base,
+bloquea el grupo durante la evaluación, actualiza tipo/revisión de forma
+condicionada y guarda el recibo en la misma transacción. La clave se limita al
+grupo/actor y su contenido canoniza grupo, actor, destino y revisión esperada;
+el permiso se vuelve a comprobar antes de devolver un recibo repetido. Un trigger
+temporal creado por la prueba provocó un error al guardar el recibo y confirmó
+rollback del cambio.
+
+`npm test` pasó 29/29 pruebas, sin omisiones, contra PostgreSQL real; incluye
+11 casos de persistencia, concurrencia e idempotencia. Esta evidencia valida solo
+la función interna y las tablas de la PoC. No demuestra autorización HTTP,
+identidad de usuarios en producción, invitaciones, cola Flutter, preservación de
+históricos financieros compartidos, despliegue ni criterios completos de T-005.
+El bloqueo por grupo serializa cambios de tipo de ese grupo en esta PoC. Las
+decisiones de producción siguen pendientes. La prueba cubre permiso revocado
+antes del replay, no un intercalado controlado de revocación durante una
+transición concurrente; el bloqueo compartido de la fila de membresía serializa
+esa escritura durante la operación.

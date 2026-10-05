@@ -27,7 +27,9 @@ $env:NEXO_API_WORKDIR = (Resolve-Path ..\api).Path
 & 'D:\Nexus\poc\.runtime\flutter\bin\flutter.bat' test integration_test/finance_flow_test.dart -d windows --dart-define=NEXO_API_URL=http://127.0.0.1:3011
 ```
 
-La integración requiere `node` en PATH y `.env` de API apuntando a la base exclusiva de la PoC; usa 3011 para no interferir con una API de desarrollo en 3000. Crea una cuenta COP 1.000,00, ingreso COP 200,00 y gasto COP 12,34; prueba caída offline, recupera archivo, sincroniza y muestra COP 1.187,66. Además, precrea una operación con el mismo ID en otra cuenta para obtener un 409 real; verifica que la causa quede visible, el movimiento se conserve y la corrección cree otro ID antes de sincronizar. El proceso visual anterior también prueba la pantalla con campos dentro del contrato.
+La integración requiere `node` en PATH y `.env` de API apuntando a la base exclusiva de la PoC; administra e inicia su propia API en 3011 para no interferir con una API de desarrollo en 3000. Crea una cuenta COP 1.000,00, ingreso COP 200,00 y gasto COP 12,34; prueba caída offline, recupera archivo, sincroniza y muestra COP 1.187,66. Además, precrea una operación con el mismo ID en otra cuenta para obtener un 409 real; verifica que la causa quede visible, el movimiento se conserve y la corrección cree otro ID antes de sincronizar. El proceso visual anterior también prueba la pantalla con campos dentro del contrato.
+
+Orden de ejecución: deja libre el puerto 3011 y ejecuta primero esta integración, que administra e inicia su API de prueba. Cuando termine, inicia la API persistente en el puerto elegido y después la instancia Windows para revisión visual. No mantengas la API persistente ocupando 3011 durante la integración.
 
 Para comprobar cierre y relanzamiento real del ejecutable Windows contra PostgreSQL dedicado, compila con API en puerto libre 3011 y ejecuta la orquestación desde esta carpeta:
 

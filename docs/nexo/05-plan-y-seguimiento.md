@@ -327,3 +327,26 @@ $env:NEXO_DATA_DIRECTORY = 'D:\Nexus\poc\.runtime\t005-runtime-recovery-20261005
 & 'D:\Nexus\poc\.runtime\flutter\bin\flutter.bat' build windows --release --dart-define=NEXO_API_URL=http://127.0.0.1:3011
 & '.\build\windows\x64\runner\Release\nexo_offline_poc.exe'
 ```
+
+## Seguimiento T-005 — persistencia experimental del cambio de modo — 5 de octubre de 2026
+
+Se aplicó la migración aditiva `20261005000000_group_mode` al clúster sintético
+PostgreSQL 17.6 existente. `npm test` compiló y pasó 29/29 sin omisiones; once
+casos de PostgreSQL cubren cambios en ambos sentidos, cardinalidad, permisos y
+miembros inactivos, revisión/no-op, diez reintentos y reconexión, colisión de
+contenido, permiso revocado, concurrencia con claves iguales/distintas y rollback
+al fallar el guardado del recibo. La revisión independiente Sol no encontró
+defectos bloqueantes.
+
+La instancia financiera Windows y su API siguen abiertas: ejecutable Release
+`poc/flutter_offline/build/windows/x64/runner/Release/nexo_offline_poc.exe`, API
+`http://127.0.0.1:3011`, datos sintéticos en
+`D:\Nexus\poc\.runtime\t005-runtime-recovery-20261005-6f3a` (ventana PID 95952,
+API PID 94168). Esta vista solo valida finanzas; no presenta grupos. Para repetir
+la integración Flutter, ejecutar primero su harness con 3011 libre; después
+iniciar la API persistente y la instancia visual. La secuencia está precisada en
+`poc/flutter_offline/README.md`.
+
+La cobertura no acredita autorización HTTP, invitaciones, sincronización offline
+de grupos ni conservación de históricos compartidos. T-005 y sus criterios
+completos siguen abiertos.

@@ -34,3 +34,37 @@ model Movement {
 
   @@index([accountId, occurredAt])
 }
+
+enum GroupMode {
+  PAREJA
+  FAMILIA
+}
+
+model Group {
+  id          String               @id @db.Uuid
+  type        GroupMode
+  revision    BigInt               @default(0)
+  memberships GroupMembership[]
+  operations  GroupModeOperation[]
+}
+
+model GroupMembership {
+  groupId       String  @db.Uuid
+  userId        String  @db.Uuid
+  active        Boolean @default(true)
+  canChangeMode Boolean @default(false)
+  group         Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([groupId, userId])
+}
+
+model GroupModeOperation {
+  groupId      String   @db.Uuid
+  actorId      String   @db.Uuid
+  operationKey String   @db.VarChar(80)
+  requestHash  String   @db.Char(64)
+  result       Json
+  group        Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([groupId, actorId, operationKey])
+}
