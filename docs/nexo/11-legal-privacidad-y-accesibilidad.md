@@ -270,7 +270,7 @@ y controles con nombres accesibles; no introduce estados dependientes del color.
 | Contraste | Texto normal 4,5:1; grande/UI relevantes 3:1 según criterio | `textContrastGuideline` pasa en los árboles comprobados al 100%/200% |
 | Teclado | Tab/Shift+Tab, foco visible/no oculto, Enter/Espacio, volver sin atrapamiento | Test widget desde `NexoPocApp`; abre, expande/contrae, consulta licencias y vuelve |
 | Puntero/táctil | Mínimo WCAG aplicable; verificar guía nativa de 48 dp Android/44 pt iOS | `labeledTapTargetGuideline`, Android e iOS pasan en el alcance automatizado; sin dispositivo físico |
-| Lectores | Orden/nombre/rol/estado con Narrator, TalkBack y VoiceOver | Windows UIA parcial: Narrator activo; 12 nombres/roles Button e InvokePattern en orden; licencia y retorno verificados. Audio no capturado; UIA no expone cuerpo ni estado expandido. Narrator completo y lectores móviles pendientes. |
+| Lectores | Orden/nombre/rol/estado con Narrator, TalkBack y VoiceOver | Windows UIA: 12 nombres/roles Button e InvokePattern en orden; `SelectableText` expone todo el cuerpo por ValuePattern. Sin HelpText, foco UIA ni estado ExpandCollapse; audio no capturado. Habla Narrator y lectores móviles pendientes. |
 | Flujos financieros | Errores claros, saldo/estado textual, contraste y foco sin perder contexto | Auditar app completa en la iteración local |
 
 Fuentes: [WCAG 2.2](https://www.w3.org/TR/WCAG22/) y
@@ -368,21 +368,43 @@ cumplimiento productivo continúan pendientes.
 
 ### Actualización C-12 — UI Automation con Narrator activo — 5 de octubre de 2026
 
-Se abrió Release Windows con el directorio de datos sintéticos independiente
-documentado arriba (PID PoC 44128); Narrator quedó activo (PID 81976). UIA
-encontró los 12 nombres de sección en el orden de `privacyUseSections`. La
-inspección inicial presentaba los encabezados como texto estático; se añadió
-`Semantics(button: true)` al título del `ExpansionTile` y se reconstruyó
-Release. UIA posterior muestra los 12 como `ControlType.Button` con
-`InvokePattern`. Al invocar la primera sección se comprobó visualmente el
-cuerpo; se verificó la vuelta desde la vista `Licenses` mediante el botón
-`Back`.
+Se inspeccionó Release Windows con el directorio de datos sintéticos
+independiente documentado arriba (PID PoC 64884); Narrator estaba activo
+(PID 93912). UIA encontró los 12 nombres de sección en orden. En una iteración
+anterior se corrigió el rol de los encabezados a `Semantics(button: true)` y
+se reconstruyó Release; esta ejecución confirma los 12 como
+`ControlType.Button` con `InvokePattern`. El inspector comparó la sección
+contraída/expandida y restauró el estado inicial. La apertura de licencias y
+retorno mediante `Back` constan en evidencia anterior, no se repitieron en esta
+ejecución. La voz de Narrator no se pudo observar.
 
-Límite observado: los nodos de botón aparecen no enfocables para UIA y sin
-`HelpText` ni patrón `ExpandCollapse`; UIA tampoco expone el texto del cuerpo
-expandido. Flutter Test sí verifica los hints localizados y estados expandido/
-contraído y cuerpo visible/oculto. Las herramientas de esta sesión no permiten
-escuchar ni capturar la voz de Narrator, por lo que quedan pendientes anuncios,
-foco y navegación de lector validados por una persona. TalkBack/VoiceOver y
-validación móvil también quedan pendientes. Captura Windows expandida
-(local, no versionada): `poc/.runtime/t005-narrator-expanded.png`.
+La evidencia adicional del inspector reproducible (`poc/.runtime/windows-
+accessibility-64884.json`) muestra el cuerpo completo en `ValuePattern.Value`
+del nodo `SelectableText`; su `Name` y `HelpText` están ausentes, y
+`TextPattern`/`LegacyIAccessiblePattern` no están soportados. La sonda
+independiente con `Text`, `SelectableText` y `ExpansionTile` bajo el mismo SDK y
+runner reproduce el mismo mapeo: `Text` expone Name, `SelectableText` expone
+contenido por ValuePattern, y ExpansionTile expone Button/InvokePattern, sin
+HelpText, foco UIA o `ExpandCollapsePattern`. Esto demuestra que esas brechas
+no son exclusivas de `PrivacyUsePage`, pero no aísla la causa entre Flutter y
+el proveedor UIA de Windows. El test widget confirma hints/estados Flutter y
+aparición/desaparición del cuerpo. La inspección UIA confirma el nombre/rol y
+contenido, no permite escuchar ni capturar voz de Narrator; quedan pendientes
+anuncios, foco/navegación hablados por una persona, TalkBack/VoiceOver y pruebas
+móviles. Evidencia sintética de la sonda:
+`poc/.runtime/windows-accessibility-94880.json` (debug, PID 94880); Release PoC
+PID 64884; Narrator PID 93912. Captura local expandida:
+`poc/.runtime/t005-narrator-expanded.png`.
+
+Reproducción PowerShell desde `poc/flutter_offline` (sin instalar paquetes):
+
+```powershell
+pwsh -NoProfile -File .\tool\inspect_windows_accessibility.ps1 -ProcessId 64884 -RunMode Release -InitialState Collapsed
+& '..\.runtime\flutter\bin\flutter.bat' run -d windows -t tool/windows_accessibility_probe.dart
+pwsh -NoProfile -File .\tool\inspect_windows_accessibility.ps1 -ProcessId 94880 -RunMode Debug -SectionName 'ExpansionTile probe synthetic' -InitialState Collapsed
+```
+
+Como el proveedor no expone `ExpandCollapsePattern`, `InitialState` se registra
+como declaración del operador, no como lectura nativa. Para repetirlo en una
+ventana existente, establece visualmente el estado declarado antes de ejecutar
+el inspector.

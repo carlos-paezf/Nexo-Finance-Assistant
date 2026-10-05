@@ -294,16 +294,29 @@ de 40 posiciones por cuerpo. Comprueba contención completa de encabezados y
 licencias. `matchesSemantics` con `MaterialLocalizations` comprueba el nombre,
 acción tap e hints para expandido/contraído, y el cuerpo presente/ausente.
 
-Se abrió Release Windows en el directorio sintético aislado (PID 44128) y se
-activó Narrator (PID 81976). UIA expone los 12 encabezados como Button con
-InvokePattern y conserva el orden; también se verificó abrir Licenses y volver
-con Back. Se corrigió el rol inicialmente estático añadiendo
-`Semantics(button: true)` y se recompiló. UIA no expone el cuerpo expandido,
-HelpText o patrón de expansión y marca los botones no enfocables; no se pudo
-escuchar ni capturar la voz. Por eso la validación humana de anuncios y foco
-sigue pendiente. Captura de la ventana expandida, local/no versionada:
-`poc/.runtime/t005-narrator-expanded.png`.
+Se creó `tool/inspect_windows_accessibility.ps1`, PowerShell UIA sin
+dependencias, limitado a la ventana/PID dado y modo Release/Debug. Registra Name, HelpText, foco,
+patrones Text/Value/Legacy/Invoke/ExpandCollapse y resultados tipados como
+ausente, no soportado o fallo de consulta. Compara toggle y restaura el estado;
+guarda JSON sintético en `poc/.runtime`.
 
-Verificaciones finales después de documentar: `flutter analyze` sin issues,
-`flutter test` 14/14 y `git diff --check` sin errores. T-005 permanece en
-progreso; no se declara conformidad, aprobación productiva ni validación móvil.
+Contra Release PoC PID 64884 y Narrator PID 93912, la sección expandida expuso
+su cuerpo completo en ValuePattern.Value. Name/HelpText no reportados en ese
+nodo; TextPattern y LegacyIAccessiblePattern no soportados. Se ejecutó además
+`flutter run -d windows -t tool/windows_accessibility_probe.dart` en modo Debug
+(PID 94880). El probe atribuye a Text un Name; SelectableText ofrece el texto
+completo por ValuePattern; ExpansionTile con Semantics button entrega
+Button/InvokePattern pero no HelpText, foco UIA ni ExpandCollapsePattern. La
+sonda confirma la misma limitación en widgets Flutter genéricos, sin demostrar
+si procede del SDK o del proveedor UIA. Licenses/Back/retorno se habían
+verificado en evidencia anterior; no se repitieron en esta ejecución. No se modificó app/tests en esta iteración porque no quedó una
+brecha exclusiva de PrivacyUsePage; sigue pendiente validación hablada manual.
+Evidencia: `poc/.runtime/windows-accessibility-64884.json` y
+`poc/.runtime/windows-accessibility-94880.json`; captura de UI expandida:
+`poc/.runtime/t005-narrator-expanded.png` (todos locales/no versionados).
+
+`flutter analyze tool/windows_accessibility_probe.dart` terminó sin issues; el
+target Debug compiló y se ejecutó, y el inspector pasó en Release y probe.
+`git diff --check` pasó sin errores. App/tests no cambiaron, así que no se
+repitió flutter test. T-005 continúa en progreso; no se declara conformidad,
+aprobación productiva ni validación móvil.

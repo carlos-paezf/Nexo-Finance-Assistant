@@ -206,17 +206,38 @@ Cabeceras y licencias deben estar contenidas completamente en el área. Los
 matchers del SDK validan nombre, tap e hints localizados para expansión y
 contracción, más aparición/desaparición del texto.
 
-Se abrió Release Windows con datos sintéticos aislados (PID PoC 44128) e inició
-Narrator (PID 81976). UIA expone 12/12 encabezados como `Button` con
-`InvokePattern` en orden; se verificó abrir `Licenses` y volver por `Back`.
-El rol estático observado inicialmente se corrigió con `Semantics(button: true)`
-y se reconstruyó Release. Limitación: UIA no expone el texto del cuerpo, hint
-ni estado expandido, y marca los botones no enfocables; tampoco hay captura de
-salida hablada. La validación manual de Narrator permanece pendiente; no se
-declara aprobación de accesibilidad ni validación móvil.
+El inspector PowerShell UIA se ejecutó contra Release PoC PID 64884, con
+Narrator PID 93912 activo. Tras el toggle, el cuerpo completo de `SelectableText`
+aparece como `ValuePattern.Value`; `Name`/`HelpText` están ausentes y
+`TextPattern`/`LegacyIAccessiblePattern` no están soportados. La sonda
+independiente Windows Debug (target `tool/windows_accessibility_probe.dart`,
+PID 94880) reproduce estos mapeos: `Text` reporta Name; `SelectableText` reporta
+el valor completo; `ExpansionTile` con semántica de botón reporta
+`Button`/`InvokePattern`, sin HelpText, foco UIA o patrón ExpandCollapse. Los
+12 encabezados de la PoC mantienen Name/rol/InvokePattern y orden; licencias y
+retorno vía Back siguen verificados. La sonda no determina si la limitación
+restante corresponde a Flutter o al proveedor Windows. Voz de Narrator no
+capturable desde las herramientas; validación hablada manual pendiente.
+Evidencia: `poc/.runtime/windows-accessibility-64884.json` y
+`poc/.runtime/windows-accessibility-94880.json` (sintéticos/no versionados).
+No se cambió la app ni los tests; no se añade otro arreglo productivo mientras
+el comportamiento restante se reproduce en el probe. T-005 continúa en progreso.
 
-Verificaciones finales después de las ediciones: `flutter analyze` sin issues;
-`flutter test` 14/14; `git diff --check` sin errores.
+`flutter analyze tool/windows_accessibility_probe.dart`: sin issues.
+`flutter run -d windows -t tool/windows_accessibility_probe.dart` compiló y
+ejecutó el target Debug separado. El inspector se ejecutó para ambas ventanas;
+los JSON conservan PID, modo/estado declarado, patrones y resultados de
+consulta. `git diff --check` pasó sin errores. App/tests no cambiaron, así que
+no se repite la suite Flutter. El PID Release 64884 permanece como instancia
+visual disponible; el proceso Debug de la sonda (94880) se cerró al terminar.
+
+Comandos UIA reproducibles, desde `poc/flutter_offline`:
+
+```powershell
+pwsh -NoProfile -File .\tool\inspect_windows_accessibility.ps1 -ProcessId 64884 -RunMode Release -InitialState Collapsed
+& '..\.runtime\flutter\bin\flutter.bat' run -d windows -t tool/windows_accessibility_probe.dart
+pwsh -NoProfile -File .\tool\inspect_windows_accessibility.ps1 -ProcessId 94880 -RunMode Debug -SectionName 'ExpansionTile probe synthetic' -InitialState Collapsed
+```
 Comando visual Release con `NEXO_DATA_DIRECTORY` independiente:
 
 ```powershell
