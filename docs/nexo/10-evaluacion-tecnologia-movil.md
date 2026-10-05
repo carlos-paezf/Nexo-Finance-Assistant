@@ -83,6 +83,28 @@ La preferencia tecnológica del usuario es Flutter + NestJS/TypeScript + Postgre
 
 La prueba `flutter test integration_test/finance_flow_test.dart -d windows --dart-define=NEXO_API_URL=http://127.0.0.1:3000` pasó 1/1 sobre la app desktop real: crear cuenta de COP 1.000,00, ingreso COP 200,00 y gasto COP 12,34; saldo COP 1.187,66; API caída y error visible; persistencia y rehidratación tras recrear el árbol de app; luego inicia API real, sincroniza cuenta/movimientos y confirma saldo. El test no mata/reinicia el ejecutable UI entero. La app también se compiló y quedó disponible para inspección local.
 
+### Iteración adicional — 5 de octubre de 2026
+
+El contrato local ahora refleja límites de API (ID ASCII 1–80, nombre 1–80,
+descripción 1–200, valores exactos hasta PostgreSQL `BIGINT`) y bloquea entradas
+inválidas antes de incorporarlas a la cola. HTTP 400/409 se clasifican como
+rechazo con causa retenida y sin replay automático; transporte/servidor quedan
+reintentables. Se puede corregir un movimiento y reencolarlo con ID nuevo.
+Prueba UI Windows 1/1 con 409 real, causa visible, corrección y saldo exacto.
+
+El harness `poc/flutter_offline/tool/verify_windows_restart.ps1` valida el
+proceso Windows Release entero: app abre offline desde archivo sintético,
+proceso terminado, API/PostgreSQL reactivados, proceso relanzado y cola
+reproducida. Confirmó dos movimientos y saldo `1122500` centavos; otro
+relanzamiento conservó dos filas. Evidencia de procesos en archivo local
+ignorado `poc/.runtime/windows-restart-validation.log`. API 3011 y última ventana
+desktop quedaron disponibles. `flutter test`: 10/10; `flutter analyze`: limpio;
+`npm test` PostgreSQL real: 5/5.
+
+T-005 permanece en progreso: experimentos físicos Android/iOS, captura nativa,
+permisos, auth/cifrado, segundo plano, batería, rendimiento y criterios T-008
+siguen pendientes. El stack productivo, versiones, DEC-004 y MVP no se aprueban.
+
 Cobertura parcial: RF-016/018, CA-I1-02 y RNF-020 a RNF-025 como flujo sintético; no sustituye criterio de rendimiento o disponibilidad productiva. Permanecen pendientes reinicio del proceso app, prueba física Android/iOS, captura por plataforma, permisos, privacidad por usuario, auth/cifrado, segundo plano, energía, rendimiento, transferencias/acuerdos compartidos. No usar datos reales.
 
 **Recomendación:** continuar con Flutter + NestJS/TypeScript + PostgreSQL/Prisma para completar T-005: ya se compilaron Flutter Windows y Nest, se ejercitó persistencia real y se verificó offline/replay en una integración GUI. La evidencia no valida Android/iOS, conectores, seguridad ni coste de equipo, por lo que no aprueba DEC-004, versiones productivas o MVP. Esas decisiones siguen pendientes.

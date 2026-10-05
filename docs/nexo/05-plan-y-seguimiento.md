@@ -91,3 +91,31 @@ Comandos reproducibles en los README de [`poc/api`](../../poc/api/README.md) y
 Implementación y documentación publicadas en la rama
 [`feat/t005-runtime-validation`](https://github.com/carlos-paezf/Nexo-Finance-Assistant/tree/feat/t005-runtime-validation),
 commit `eb12ebea0615a33f4a0e09bb3781c86c03fb0c14`.
+
+## Seguimiento T-005 — límites, rechazos y relanzamiento Windows — 5 de octubre de 2026
+
+**En progreso.** Se alinearon formularios/repositorio Flutter con los límites
+validados por `FinanceService`: ID ASCII de 1–80, nombre 1–80, descripción
+1–200, importes exactos hasta PostgreSQL `BIGINT`. Pruebas confirman que datos
+inválidos no se persisten en la cola. HTTP 400/409 quedan guardados con causa
+como rechazos no reintentables; red/servidor quedan reintentables. La interfaz
+permite corregir cuentas o movimientos rechazados y reencolarlos con una clave
+nueva.
+
+Evidencia Windows: `flutter analyze` limpio; `flutter test` 10/10; `npm test` con
+PostgreSQL real 5/5; integración de interfaz 1/1 con conflicto 409 real,
+corrección y saldo COP 1.187,66. El harness
+`poc/flutter_offline/tool/verify_windows_restart.ps1` cerró el ejecutable Release
+tras un primer arranque offline, reactivó NestJS, relanzó el `.exe`, rehidrató y
+sincronizó 2 movimientos. PostgreSQL mostró `1122500` centavos y exactamente 2
+filas; un segundo replay no duplicó. Evidencia de procesos en
+`poc/.runtime/windows-restart-validation.log`; la última app y API 3011 quedan
+disponibles.
+
+Se añadió a `AGENTS.md` la regla de vista previa ejecutable y commits
+Conventional Commits preparada en PR #1. T-005 permanece abierta: faltan
+experimentos físicos Android/iOS y captura nativa, permisos, seguridad/auth,
+cifrado, segundo plano, energía y rendimiento. Flutter + NestJS/TypeScript +
+PostgreSQL/Prisma sigue siendo preferencia para la PoC; DEC-004, versiones
+productivas, validación técnica completa y aprobación del MVP continúan
+pendientes. Solo se usaron datos sintéticos.

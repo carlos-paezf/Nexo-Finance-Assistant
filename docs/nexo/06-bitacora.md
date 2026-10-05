@@ -172,3 +172,33 @@ Rama publicada para revisión: [feat/t005-runtime-validation](https://github.com
 Commit de implementación/documentación: `eb12ebea0615a33f4a0e09bb3781c86c03fb0c14` —
 `test(poc): validate offline flow on Windows`. La rama quedó configurada para
 seguir `origin/feat/t005-runtime-validation`; no se abrió PR.
+
+## 5 de octubre de 2026 — T-005: validación de límites y relanzamiento Windows
+
+Se ajustaron formularios y `NexoRepository` al contrato backend: ID ASCII
+1–80, nombre de cuenta 1–80, descripción 1–200 e importes exactos hasta
+`9223372036854775807` centavos. Las pruebas rechazan datos antes de escribir
+cola/archivo. HTTP 400/409 se conserva en disco con causa y sin replay
+automático; red/servidor quedan reintentables. La interfaz permite corregir un
+movimiento rechazado y reencolarlo con ID nuevo. Conflicto 409 real/corrección
+comprobados en flujo Windows.
+
+`flutter analyze` pasó sin issues; `flutter test` 10/10, incluido 100 movimientos,
+recuperación y replay; `npm test` 5/5 contra PostgreSQL real. La integración
+Windows 1/1 verificó alta, ingreso/gasto, API offline, rechazo 409 con causa,
+corrección, sincronización y saldo COP 1.187,66. La primera integración falló
+al disponer controladores antes de finalizar la animación del diálogo; al mover
+su ciclo de vida al propio diálogo, pasó.
+
+El harness Release en `poc/flutter_offline/tool/verify_windows_restart.ps1`
+sembró datos sintéticos, abrió el ejecutable offline, verificó la ventana,
+terminó el proceso, reactivó NestJS y relanzó el `.exe`. PostgreSQL confirmó dos
+movimientos y saldo 1.122.500 COP en centavos; un segundo cierre/relanzamiento
+dejó dos filas. Log local ignorado:
+`poc/.runtime/windows-restart-validation.log`. API 3011 e instancia visual final
+permanecen abiertas.
+
+`AGENTS.md` mantiene sus instrucciones y añade las reglas de vista ejecutable y
+Conventional Commits del PR #1. T-005 sigue en progreso mientras falten
+experimentos móviles físicos/nativos. Stack productivo, versiones, DEC-004 y
+alcance del MVP siguen pendientes. Datos sintéticos solamente.
