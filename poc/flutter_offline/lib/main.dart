@@ -11,7 +11,11 @@ import 'money.dart';
 void main() => runApp(const NexoPocApp());
 
 class NexoPocApp extends StatelessWidget {
-  const NexoPocApp({super.key, this.apiBaseUrl, this.supportDirectoryProvider, this.idProvider});
+  const NexoPocApp(
+      {super.key,
+      this.apiBaseUrl,
+      this.supportDirectoryProvider,
+      this.idProvider});
 
   final String? apiBaseUrl;
   final Future<Directory> Function()? supportDirectoryProvider;
@@ -40,7 +44,11 @@ class NexoPocApp extends StatelessWidget {
 }
 
 class LedgerPage extends StatefulWidget {
-  const LedgerPage({super.key, this.apiBaseUrl, this.supportDirectoryProvider, this.idProvider});
+  const LedgerPage(
+      {super.key,
+      this.apiBaseUrl,
+      this.supportDirectoryProvider,
+      this.idProvider});
 
   final String? apiBaseUrl;
   final Future<Directory> Function()? supportDirectoryProvider;
@@ -59,7 +67,8 @@ class _LedgerPageState extends State<LedgerPage> {
   final _random = Random.secure();
   late final HttpFinanceApi _api = HttpFinanceApi(
     widget.apiBaseUrl ??
-        const String.fromEnvironment('NEXO_API_URL', defaultValue: 'http://127.0.0.1:3000'),
+        const String.fromEnvironment('NEXO_API_URL',
+            defaultValue: 'http://127.0.0.1:3000'),
   );
   late final Future<Directory> Function() _supportDirectory =
       widget.supportDirectoryProvider ?? getApplicationSupportDirectory;
@@ -76,7 +85,10 @@ class _LedgerPageState extends State<LedgerPage> {
 
   Future<void> _open() async {
     try {
-      final directory = await _supportDirectory();
+      final testDirectory = Platform.environment['NEXO_DATA_DIRECTORY'];
+      final directory = testDirectory == null
+          ? await _supportDirectory()
+          : Directory(testDirectory);
       final repository = NexoRepository(
         LocalStore('${directory.path}/nexo_offline_poc.json'),
         _api,
@@ -87,6 +99,10 @@ class _LedgerPageState extends State<LedgerPage> {
         _repository = repository;
         _busy = false;
       });
+      if (Platform.environment['NEXO_SYNC_ON_START'] == '1') {
+        await repository.sync();
+        if (mounted) setState(() {});
+      }
     } catch (_) {
       if (!mounted) return;
       setState(() {
@@ -100,6 +116,8 @@ class _LedgerPageState extends State<LedgerPage> {
     final parsed = parseCopCents(controller.text, allowZero: allowZero);
     return parsed == null ? null : int.tryParse(parsed);
   }
+
+  int? _accountCents() => _cents(_opening, allowZero: true);
 
   Future<void> _createAccount() async {
     if (!_formKey.currentState!.validate()) return;
@@ -125,7 +143,8 @@ class _LedgerPageState extends State<LedgerPage> {
     }
   }
 
-  String _newId() => widget.idProvider?.call() ??
+  String _newId() =>
+      widget.idProvider?.call() ??
       '${DateTime.now().toUtc().microsecondsSinceEpoch}-${_random.nextInt(1 << 32)}';
 
   Future<bool> _run(Future<void> Function() action) async {
@@ -133,10 +152,13 @@ class _LedgerPageState extends State<LedgerPage> {
     try {
       await action();
       return true;
-    } catch (_) {
+    } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No se guardó. Revisa los datos e inténtalo de nuevo.')),
+          SnackBar(
+              content: Text(error is ArgumentError
+                  ? error.message.toString()
+                  : 'No se guardó. Revisa los datos e inténtalo de nuevo.')),
         );
       }
       return false;
@@ -162,7 +184,8 @@ class _LedgerPageState extends State<LedgerPage> {
       appBar: AppBar(title: const Text('Nexo · prueba sin conexión')),
       body: _busy && repository == null
           ? const Center(
-              child: CircularProgressIndicator(semanticsLabel: 'Abriendo cuenta'),
+              child:
+                  CircularProgressIndicator(semanticsLabel: 'Abriendo cuenta'),
             )
           : _loadError != null
               ? Center(child: Text(_loadError!))
@@ -187,13 +210,16 @@ class _LedgerPageState extends State<LedgerPage> {
                               Semantics(
                                 header: true,
                                 child: Text('Movimientos',
-                                    style: Theme.of(context).textTheme.titleLarge),
+                                    style:
+                                        Theme.of(context).textTheme.titleLarge),
                               ),
                               const SizedBox(height: 8),
                               if (repository.state.movements.isEmpty)
-                                const Text('Aún no hay movimientos. Registra un ingreso o un gasto.')
+                                const Text(
+                                    'Aún no hay movimientos. Registra un ingreso o un gasto.')
                               else
-                                ...repository.state.movements.map(_movementTile),
+                                ...repository.state.movements
+                                    .map(_movementTile),
                             ],
                           ],
                         ),
@@ -207,9 +233,11 @@ class _LedgerPageState extends State<LedgerPage> {
   Widget _accountForm() => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Crea una cuenta', style: Theme.of(context).textTheme.headlineSmall),
+          Text('Crea una cuenta',
+              style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 8),
-          const Text('Los datos se guardan en este dispositivo. Usa información sintética.'),
+          const Text(
+              'Los datos se guardan en este dispositivo. Usa información sintética.'),
           const SizedBox(height: 20),
           TextFormField(
             controller: _accountName,
@@ -217,15 +245,17 @@ class _LedgerPageState extends State<LedgerPage> {
             textCapitalization: TextCapitalization.sentences,
             validator: (value) => value == null || value.trim().isEmpty
                 ? 'Escribe un nombre para la cuenta.'
-                : null,
+                : value.trim().length > 80
+                    ? 'Usa hasta 80 caracteres.'
+                    : null,
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _opening,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: const InputDecoration(labelText: 'Saldo inicial (COP)'),
-            validator: (value) => _cents(_opening, allowZero: true) == null
-                ? 'Usa COP con máximo dos decimales.'
+            validator: (value) => _accountCents() == null
+                ? 'Usa COP válido, con máximo dos decimales y dentro del rango permitido.'
                 : null,
           ),
           const SizedBox(height: 16),
@@ -238,11 +268,13 @@ class _LedgerPageState extends State<LedgerPage> {
       );
 
   Widget _balance(Snapshot snapshot) => Semantics(
-        label: 'Saldo local ${formatCop(snapshot.localBalanceCents)} pesos colombianos',
+        label:
+            'Saldo local ${formatCop(snapshot.localBalanceCents)} pesos colombianos',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(snapshot.account!.name, style: Theme.of(context).textTheme.titleMedium),
+            Text(snapshot.account!.name,
+                style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 4),
             Text('Saldo en este dispositivo (incluye pendientes)',
                 style: Theme.of(context).textTheme.bodyMedium),
@@ -261,7 +293,8 @@ class _LedgerPageState extends State<LedgerPage> {
         children: [
           Semantics(
             header: true,
-            child: Text('Nuevo movimiento', style: Theme.of(context).textTheme.titleLarge),
+            child: Text('Nuevo movimiento',
+                style: Theme.of(context).textTheme.titleLarge),
           ),
           const SizedBox(height: 12),
           SegmentedButton<MovementType>(
@@ -270,7 +303,8 @@ class _LedgerPageState extends State<LedgerPage> {
               ButtonSegment(value: MovementType.expense, label: Text('Gasto')),
             ],
             selected: {_type},
-            onSelectionChanged: (selection) => setState(() => _type = selection.first),
+            onSelectionChanged: (selection) =>
+                setState(() => _type = selection.first),
           ),
           const SizedBox(height: 12),
           TextFormField(
@@ -279,7 +313,9 @@ class _LedgerPageState extends State<LedgerPage> {
             textCapitalization: TextCapitalization.sentences,
             validator: (value) => value == null || value.trim().isEmpty
                 ? 'Escribe una descripción.'
-                : null,
+                : value.trim().length > 200
+                    ? 'Usa hasta 200 caracteres.'
+                    : null,
           ),
           const SizedBox(height: 12),
           TextFormField(
@@ -290,14 +326,15 @@ class _LedgerPageState extends State<LedgerPage> {
               helperText: 'Hasta dos decimales; por ejemplo, 1234,56',
             ),
             validator: (value) => _cents(_amount) == null
-                ? 'Ingresa un importe mayor que cero, con hasta dos decimales.'
+                ? 'Ingresa un importe positivo en COP, con hasta dos decimales y dentro del rango permitido.'
                 : null,
           ),
           const SizedBox(height: 12),
           FilledButton.icon(
             onPressed: _busy ? null : _addMovement,
             icon: const Icon(Icons.add),
-            label: Text('Guardar ${_type == MovementType.income ? 'ingreso' : 'gasto'}'),
+            label: Text(
+                'Guardar ${_type == MovementType.income ? 'ingreso' : 'gasto'}'),
           ),
         ],
       );
@@ -309,6 +346,15 @@ class _LedgerPageState extends State<LedgerPage> {
         movements.where((m) => m.status == SyncStatus.pending).length;
     final errors = (account.status == SyncStatus.error ? 1 : 0) +
         movements.where((m) => m.status == SyncStatus.error).length;
+    final retryable =
+        (account.status == SyncStatus.error && !account.syncRejected ? 1 : 0) +
+            (account.syncRejected
+                ? 0
+                : movements
+                    .where((m) =>
+                        m.status == SyncStatus.pending ||
+                        (m.status == SyncStatus.error && !m.syncRejected))
+                    .length);
     final synced = (account.status == SyncStatus.synced ? 1 : 0) +
         movements.where((m) => m.status == SyncStatus.synced).length;
     return Column(
@@ -316,13 +362,35 @@ class _LedgerPageState extends State<LedgerPage> {
       children: [
         Text('Sincronización', style: Theme.of(context).textTheme.titleLarge),
         Text('$pending pendientes · $synced sincronizados · $errors con error'),
+        if (account.syncError != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Semantics(
+              liveRegion: true,
+              child: Text(
+                account.syncRejected
+                    ? 'La API rechazó la cuenta (400/409): ${account.syncError}'
+                    : 'Error temporal de la cuenta: ${account.syncError}',
+                key: const ValueKey('account-sync-error'),
+              ),
+            ),
+          ),
+        if (account.syncRejected)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: _busy ? null : _correctAccount,
+              icon: const Icon(Icons.edit_outlined),
+              label: const Text('Corregir cuenta'),
+            ),
+          ),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: [
             FilledButton.tonalIcon(
-              onPressed: _busy || pending + errors == 0
+              onPressed: _busy || pending + retryable == 0
                   ? null
                   : () async => _run(repository.sync),
               icon: const Icon(Icons.sync),
@@ -331,7 +399,8 @@ class _LedgerPageState extends State<LedgerPage> {
           ],
         ),
         const SizedBox(height: 4),
-        const Text('La cuenta y los movimientos pendientes se conservan en el dispositivo.'),
+        const Text(
+            'La cuenta y los movimientos pendientes se conservan en el dispositivo.'),
       ],
     );
   }
@@ -341,16 +410,213 @@ class _LedgerPageState extends State<LedgerPage> {
     final status = switch (movement.status) {
       SyncStatus.pending => 'Pendiente de sincronizar',
       SyncStatus.synced => 'Sincronizado',
-      SyncStatus.error => 'Error de sincronización; puedes reintentar',
+      SyncStatus.error when movement.syncRejected =>
+        'Rechazado por la API; registro conservado',
+      SyncStatus.error => 'Error temporal; se puede reintentar',
     };
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Icon(income ? Icons.arrow_downward : Icons.arrow_upward,
-          semanticLabel: income ? 'Ingreso' : 'Gasto'),
-      title: Text(movement.description),
-      subtitle: Text('${income ? 'Ingreso' : 'Gasto'} · $status'),
-      trailing: Text('${income ? '+' : '−'}${formatCop(movement.cents)}',
-          textAlign: TextAlign.end),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: Icon(income ? Icons.arrow_downward : Icons.arrow_upward,
+              semanticLabel: income ? 'Ingreso' : 'Gasto'),
+          title: Text(movement.description),
+          subtitle: Text([
+            '${income ? 'Ingreso' : 'Gasto'} · $status',
+            if (movement.syncError != null)
+              movement.syncRejected
+                  ? 'Rechazo API (400/409): ${movement.syncError}'
+                  : movement.syncError!,
+          ].join('\n')),
+          trailing: Text('${income ? '+' : '−'}${formatCop(movement.cents)}',
+              textAlign: TextAlign.end),
+        ),
+        if (movement.syncRejected)
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: _busy ? null : () => _correctMovement(movement),
+              icon: const Icon(Icons.edit_outlined),
+              label: const Text('Corregir registro'),
+            ),
+          ),
+      ],
     );
   }
+
+  Future<void> _correctMovement(Movement movement) async {
+    final correction = await showDialog<(String, String)?>(
+      context: context,
+      builder: (_) => _MovementCorrectionDialog(movement: movement),
+    );
+    if (correction == null || !mounted) return;
+    final cents = int.parse(parseCopCents(correction.$2)!);
+    await _run(() => _repository!.correctRejectedMovement(
+          previousId: movement.id,
+          id: _newId(),
+          description: correction.$1,
+          cents: cents,
+        ));
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _correctAccount() async {
+    final account = _repository?.state.account;
+    if (account == null) return;
+    final correction = await showDialog<(String, String)?>(
+      context: context,
+      builder: (_) => _AccountCorrectionDialog(account: account),
+    );
+    if (correction == null || !mounted) return;
+    final openingCents =
+        int.parse(parseCopCents(correction.$2, allowZero: true)!);
+    await _run(() => _repository!.correctRejectedAccount(
+          id: _newId(),
+          name: correction.$1,
+          openingCents: openingCents,
+        ));
+  }
+}
+
+class _AccountCorrectionDialog extends StatefulWidget {
+  const _AccountCorrectionDialog({required this.account});
+  final Account account;
+
+  @override
+  State<_AccountCorrectionDialog> createState() =>
+      _AccountCorrectionDialogState();
+}
+
+class _AccountCorrectionDialogState extends State<_AccountCorrectionDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final _name = TextEditingController(text: widget.account.name);
+  late final _opening = TextEditingController(
+    text: formatCop(widget.account.openingCents)
+        .replaceAll(r'$', '')
+        .replaceAll('.', ''),
+  );
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _opening.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+        title: const Text('Corregir cuenta rechazada'),
+        content: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _name,
+                maxLength: 80,
+                decoration:
+                    const InputDecoration(labelText: 'Nombre de la cuenta'),
+                validator: (value) => value == null || value.trim().isEmpty
+                    ? 'Escribe un nombre para la cuenta.'
+                    : null,
+              ),
+              TextFormField(
+                controller: _opening,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration:
+                    const InputDecoration(labelText: 'Saldo inicial (COP)'),
+                validator: (value) =>
+                    parseCopCents(value ?? '', allowZero: true) == null
+                        ? 'Ingresa un saldo inicial válido.'
+                        : null,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar')),
+          FilledButton(
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                Navigator.pop(context, (_name.text, _opening.text));
+              }
+            },
+            child: const Text('Guardar corrección'),
+          ),
+        ],
+      );
+}
+
+class _MovementCorrectionDialog extends StatefulWidget {
+  const _MovementCorrectionDialog({required this.movement});
+  final Movement movement;
+
+  @override
+  State<_MovementCorrectionDialog> createState() =>
+      _MovementCorrectionDialogState();
+}
+
+class _MovementCorrectionDialogState extends State<_MovementCorrectionDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final _description =
+      TextEditingController(text: widget.movement.description);
+  late final _amount = TextEditingController(
+    text: formatCop(widget.movement.cents)
+        .replaceAll(r'$', '')
+        .replaceAll('.', ''),
+  );
+
+  @override
+  void dispose() {
+    _description.dispose();
+    _amount.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+        title: const Text('Corregir movimiento rechazado'),
+        content: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _description,
+                maxLength: 200,
+                decoration: const InputDecoration(labelText: 'Descripción'),
+                validator: (value) => value == null || value.trim().isEmpty
+                    ? 'Escribe una descripción.'
+                    : null,
+              ),
+              TextFormField(
+                controller: _amount,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(labelText: 'Importe (COP)'),
+                validator: (value) => parseCopCents(value ?? '') == null
+                    ? 'Ingresa un importe positivo válido.'
+                    : null,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar')),
+          FilledButton(
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                Navigator.pop(context, (_description.text, _amount.text));
+              }
+            },
+            child: const Text('Guardar corrección'),
+          ),
+        ],
+      );
 }

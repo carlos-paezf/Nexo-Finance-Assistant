@@ -5,40 +5,60 @@ enum MovementType { income, expense }
 
 enum SyncStatus { pending, synced, error }
 
+class SyncApiException implements Exception {
+  const SyncApiException(this.statusCode, this.message);
+  final int statusCode;
+  final String message;
+  bool get isRejected => statusCode == 400 || statusCode == 409;
+}
+
 class Account {
   const Account({
     required this.id,
     required this.name,
     required this.openingCents,
     this.status = SyncStatus.pending,
+    this.syncError,
+    this.syncRejected = false,
   });
 
   final String id;
   final String name;
   final int openingCents;
   final SyncStatus status;
+  final String? syncError;
+  final bool syncRejected;
 
-  Map<String, Object> toJson() => {
+  Map<String, Object?> toJson() => {
         'id': id,
         'name': name,
         'openingCents': openingCents,
         'status': status.name,
+        'syncError': syncError,
+        'syncRejected': syncRejected,
       };
 
-  factory Account.fromJson(Map<String, dynamic> json, {bool legacy = false}) => Account(
+  factory Account.fromJson(Map<String, dynamic> json, {bool legacy = false}) =>
+      Account(
         id: legacy ? 'legacy-account-v1' : json['id'] as String,
         name: json['name'] as String,
         openingCents: json['openingCents'] as int,
         status: legacy
             ? SyncStatus.pending
             : SyncStatus.values.byName(json['status'] as String),
+        syncError: legacy ? null : json['syncError'] as String?,
+        syncRejected: legacy ? false : json['syncRejected'] as bool? ?? false,
       );
 
-  Account withStatus(SyncStatus value) => Account(
+  Account withStatus(SyncStatus value,
+          {String? error, bool rejected = false}) =>
+      Account(
         id: id,
         name: name,
         openingCents: openingCents,
         status: value,
+        syncError: error,
+        syncRejected: rejected,
       );
 }
 
@@ -50,6 +70,8 @@ class Movement {
     required this.type,
     required this.createdAt,
     required this.status,
+    this.syncError,
+    this.syncRejected = false,
   });
 
   final String id;
@@ -58,14 +80,18 @@ class Movement {
   final MovementType type;
   final DateTime createdAt;
   final SyncStatus status;
+  final String? syncError;
+  final bool syncRejected;
 
-  Map<String, Object> toJson() => {
+  Map<String, Object?> toJson() => {
         'id': id,
         'description': description,
         'cents': cents,
         'type': type.name,
         'createdAt': createdAt.toIso8601String(),
         'status': status.name,
+        'syncError': syncError,
+        'syncRejected': syncRejected,
       };
 
   factory Movement.fromJson(Map<String, dynamic> json) => Movement(
@@ -75,15 +101,21 @@ class Movement {
         type: MovementType.values.byName(json['type'] as String),
         createdAt: DateTime.parse(json['createdAt'] as String),
         status: SyncStatus.values.byName(json['status'] as String),
+        syncError: json['syncError'] as String?,
+        syncRejected: json['syncRejected'] as bool? ?? false,
       );
 
-  Movement withStatus(SyncStatus value) => Movement(
+  Movement withStatus(SyncStatus value,
+          {String? error, bool rejected = false}) =>
+      Movement(
         id: id,
         description: description,
         cents: cents,
         type: type,
         createdAt: createdAt,
         status: value,
+        syncError: error,
+        syncRejected: rejected,
       );
 }
 
@@ -102,7 +134,8 @@ class Snapshot {
 
   int get localBalanceCents => movements.fold(
         account?.openingCents ?? 0,
-        (balance, item) => balance +
+        (balance, item) =>
+            balance +
             (item.type == MovementType.income ? item.cents : -item.cents),
       );
 
@@ -128,7 +161,8 @@ class Snapshot {
               legacy: version == 1,
             ),
       movements: (json['movements'] as List<dynamic>)
-          .map((item) => Movement.fromJson(Map<String, dynamic>.from(item as Map)))
+          .map((item) =>
+              Movement.fromJson(Map<String, dynamic>.from(item as Map)))
           .toList(growable: false),
       serverBalanceCents: json['serverBalanceCents'] as int?,
       revision: version == 1 ? 0 : json['revision'] as int,
@@ -145,8 +179,9 @@ class Snapshot {
       Snapshot(
         account: account ?? this.account,
         movements: movements ?? this.movements,
-        serverBalanceCents:
-            clearServerBalance ? null : serverBalanceCents ?? this.serverBalanceCents,
+        serverBalanceCents: clearServerBalance
+            ? null
+            : serverBalanceCents ?? this.serverBalanceCents,
         revision: revision ?? this.revision,
       );
 }
@@ -181,7 +216,8 @@ class LocalStore {
       final snapshot = Snapshot.fromJson(
         jsonDecode(await candidate.readAsString()) as Map<String, dynamic>,
       );
-      if (latest == null || snapshot.revision > latest.revision) latest = snapshot;
+      if (latest == null || snapshot.revision > latest.revision)
+        latest = snapshot;
     }
     return latest!;
   }
@@ -223,11 +259,19 @@ class NexoRepository {
 
   Future<void> load() async => state = await store.read();
 
-  Future<void> createAccount({required String id, required String name, required int openingCents}) async {
+  Future<void> createAccount(
+      {required String id,
+      required String name,
+      required int openingCents}) async {
     if (state.account != null) throw StateError('La cuenta ya existe.');
     final normalized = name.trim();
-    if (id.isEmpty || normalized.isEmpty || openingCents < 0) {
-      throw ArgumentError('Revisa el ID, el nombre y el saldo inicial.');
+    if (!_validId(id) ||
+        normalized.isEmpty ||
+        normalized.length > 80 ||
+        openingCents < 0 ||
+        openingCents > _maxPgBigint) {
+      throw ArgumentError(
+          'El ID debe tener hasta 80 caracteres válidos, el nombre entre 1 y 80 caracteres y el saldo entre 0 y el máximo permitido.');
     }
     await _save(state.copyWith(
       account: Account(id: id, name: normalized, openingCents: openingCents),
@@ -244,8 +288,14 @@ class NexoRepository {
   }) async {
     if (state.account == null) throw StateError('Primero crea una cuenta.');
     final label = description.trim();
-    if (id.isEmpty || label.isEmpty || cents <= 0 || state.movements.any((m) => m.id == id)) {
-      throw ArgumentError('Movimiento inválido o ID repetido.');
+    if (!_validId(id) ||
+        label.isEmpty ||
+        label.length > 200 ||
+        cents <= 0 ||
+        cents > _maxPgBigint ||
+        state.movements.any((m) => m.id == id)) {
+      throw ArgumentError(
+          'El ID debe tener hasta 80 caracteres válidos, la descripción entre 1 y 200 caracteres y el importe debe ser positivo y válido.');
     }
     await _save(state.copyWith(movements: [
       Movement(
@@ -260,26 +310,104 @@ class NexoRepository {
     ]));
   }
 
+  Future<void> correctRejectedMovement({
+    required String previousId,
+    required String id,
+    required String description,
+    required int cents,
+  }) async {
+    Movement? previous;
+    for (final item in state.movements) {
+      if (item.id == previousId) previous = item;
+    }
+    if (previous == null || !previous.syncRejected) {
+      throw StateError(
+          'Solo puedes corregir movimientos rechazados por la API.');
+    }
+    final label = description.trim();
+    if (!_validId(id) ||
+        label.isEmpty ||
+        label.length > 200 ||
+        cents <= 0 ||
+        cents > _maxPgBigint ||
+        state.movements.any((item) => item.id == id && item.id != previousId)) {
+      throw ArgumentError(
+          'Revisa la descripción y el importe antes de guardar.');
+    }
+    await _save(state.copyWith(
+        movements: state.movements
+            .map(
+              (item) => item.id == previousId
+                  ? Movement(
+                      id: id,
+                      description: label,
+                      cents: cents,
+                      type: item.type,
+                      createdAt: item.createdAt,
+                      status: SyncStatus.pending,
+                    )
+                  : item,
+            )
+            .toList()));
+  }
+
+  Future<void> correctRejectedAccount({
+    required String id,
+    required String name,
+    required int openingCents,
+  }) async {
+    final account = state.account;
+    final normalized = name.trim();
+    if (account == null || !account.syncRejected) {
+      throw StateError('Solo puedes corregir una cuenta rechazada por la API.');
+    }
+    if (!_validId(id) ||
+        normalized.isEmpty ||
+        normalized.length > 80 ||
+        openingCents < 0 ||
+        openingCents > _maxPgBigint) {
+      throw ArgumentError(
+          'Revisa el ID, el nombre y el saldo inicial antes de guardar.');
+    }
+    await _save(state.copyWith(
+      account: Account(id: id, name: normalized, openingCents: openingCents),
+      clearServerBalance: true,
+    ));
+  }
+
   Future<void> sync() async {
     final account = state.account;
-    if (account == null) return;
+    if (account == null || account.syncRejected) return;
     if (account.status != SyncStatus.synced) {
       try {
         await api.createAccount(account);
-        await _save(state.copyWith(account: account.withStatus(SyncStatus.synced)));
-      } catch (_) {
-        await _save(state.copyWith(account: account.withStatus(SyncStatus.error)));
+      } catch (error) {
+        final failure = _syncFailure(error);
+        await _save(state.copyWith(
+            account: account.withStatus(
+          SyncStatus.error,
+          error: failure.$1,
+          rejected: failure.$2,
+        )));
         return;
       }
+      await _save(
+          state.copyWith(account: account.withStatus(SyncStatus.synced)));
     }
     for (final item in List<Movement>.of(state.movements)) {
-      if (item.status == SyncStatus.synced) continue;
+      if (item.status == SyncStatus.synced || item.syncRejected) continue;
       try {
         await api.createMovement(account.id, item);
-        await _replace(item.withStatus(SyncStatus.synced));
-      } catch (_) {
-        await _replace(item.withStatus(SyncStatus.error));
+      } catch (error) {
+        final failure = _syncFailure(error);
+        await _replace(item.withStatus(
+          SyncStatus.error,
+          error: failure.$1,
+          rejected: failure.$2,
+        ));
+        continue;
       }
+      await _replace(item.withStatus(SyncStatus.synced));
     }
     try {
       final balance = await api.readBalance(account.id);
@@ -291,8 +419,25 @@ class NexoRepository {
     }
   }
 
+  static const _maxPgBigint = 9223372036854775807;
+  static final _idPattern = RegExp(r'^[A-Za-z0-9_-]{1,80}$');
+
+  bool _validId(String id) => _idPattern.hasMatch(id);
+
+  (String, bool) _syncFailure(Object error) {
+    if (error is SyncApiException) return (error.message, error.isRejected);
+    if (error is SocketException)
+      return ('No hay conexión con la API. Se volverá a intentar.', false);
+    if (error is HttpException) return (error.message, false);
+    return (
+      'No se pudo sincronizar. Se conservaron los datos para reintentar.',
+      false
+    );
+  }
+
   Future<void> _replace(Movement item) => _save(state.copyWith(
-        movements: state.movements.map((m) => m.id == item.id ? item : m).toList(),
+        movements:
+            state.movements.map((m) => m.id == item.id ? item : m).toList(),
       ));
 
   Future<void> _save(Snapshot next) async {

@@ -7,7 +7,8 @@ class HttpFinanceApi implements FinanceApi {
   HttpFinanceApi(String baseUrl) : _baseUrl = Uri.parse(baseUrl);
 
   final Uri _baseUrl;
-  final HttpClient _client = HttpClient()..connectionTimeout = const Duration(seconds: 3);
+  final HttpClient _client = HttpClient()
+    ..connectionTimeout = const Duration(seconds: 3);
 
   @override
   Future<void> createAccount(Account account) async {
@@ -20,7 +21,8 @@ class HttpFinanceApi implements FinanceApi {
 
   @override
   Future<void> createMovement(String accountId, Movement movement) async {
-    await _request('POST', '/accounts/${Uri.encodeComponent(accountId)}/movements', {
+    await _request(
+        'POST', '/accounts/${Uri.encodeComponent(accountId)}/movements', {
       'id': movement.id,
       'type': movement.type.name,
       'description': movement.description,
@@ -42,14 +44,24 @@ class HttpFinanceApi implements FinanceApi {
     return int.parse(cents);
   }
 
-  Future<Object?> _request(String method, String path, [Map<String, Object>? body]) async {
+  Future<Object?> _request(String method, String path,
+      [Map<String, Object>? body]) async {
     final request = await _client.openUrl(method, _baseUrl.resolve(path));
     request.headers.contentType = ContentType.json;
     if (body != null) request.write(jsonEncode(body));
     final response = await request.close().timeout(const Duration(seconds: 8));
     final responseText = await response.transform(utf8.decoder).join();
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw HttpException('API ${response.statusCode}: $responseText');
+      var message = 'La API no pudo completar la operación.';
+      try {
+        final payload = jsonDecode(responseText);
+        if (payload is Map<String, dynamic> && payload['message'] is String) {
+          message = payload['message'] as String;
+        }
+      } on FormatException {
+        // Keep a safe, actionable fallback for non-JSON responses.
+      }
+      throw SyncApiException(response.statusCode, message);
     }
     return responseText.isEmpty ? null : jsonDecode(responseText);
   }
