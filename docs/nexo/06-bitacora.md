@@ -349,3 +349,26 @@ reintentos, concurrencia, reparto entre tres y preservación histórica; no se h
 ejecutado. Notion se sincronizó en las páginas enlazadas de RF/RNF, arquitectura,
 MVP, aceptación I1/I2, evaluación, plan y bitácora. La lectura de regreso confirmó
 contenido completo, sin truncamiento ni bloques desconocidos.
+
+## 5 de octubre de 2026 — política experimental de cambio PAREJA/FAMILIA
+
+Contrato propuesto, todavía no productivo: el cambio de tipo conserva las
+membresías actuales; PAREJA→FAMILIA no vuelve a invitar a sus miembros. La
+incorporación se mantiene como operación aparte con invitación aceptada. PAREJA
+admite dos miembros activos como máximo; FAMILIA conserva dos o más. Conversión
+FAMILIA→PAREJA con más de dos activos rechazada hasta resolver membresías sin
+expulsión automática. Se creó `poc/api/src/groups/group-mode.ts`: función pura
+con snapshot, destino, revisión esperada y contexto confiable; entrega no-op,
+parche de tipo/revisión o rechazo tipado. No muta ni toca persistencia,
+membresías o datos financieros.
+
+`npm test` compiló y ejecutó 17 pruebas: 16 pasaron (4 existentes de finanzas,
+12 nuevas de política), 1 integración PostgreSQL falló porque no había servidor
+en `127.0.0.1:55432`. Las 12 unitarias cubren conversiones, cardinalidad de
+activos, actor/permisos/grupo, destino y revisión, no-op, entradas congeladas y
+ausencia de cambios parciales. Revisión independiente Sol acotada: ningún defecto
+bloqueante; la cobertura solicitada se amplió. No se acredita persistencia,
+atomicidad real, autorización HTTP, replay ni idempotencia extremo a extremo.
+Sin cambios Flutter/UI ni rebuild; al comprobar no se encontró proceso Nexo de
+la PoC en ejecución, y no se cerró ninguna instancia.
+T-005 y CA-I2-11 a CA-I2-17 siguen en progreso/pendientes de integración.

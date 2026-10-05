@@ -273,3 +273,17 @@ propuestas o pendientes. No se ejecutaron pruebas de producto por ser una
 actualización de especificación. Notion se sincronizó en las páginas enlazadas de
 RF/RNF, arquitectura, MVP, aceptación I1/I2, evaluación, plan y bitácora; lectura
 de regreso confirmó contenido completo, sin truncamiento ni bloques desconocidos.
+
+## Seguimiento T-005 — política experimental de cambio de modo — 5 de octubre de 2026
+
+Se precisó como propuesta experimental que PAREJA→FAMILIA conserva miembros
+activos y no implica invitación; incorporar miembros sigue separado y requiere
+invitación aceptada. PAREJA admite hasta dos activos; FAMILIA puede conservar
+dos. FAMILIA→PAREJA con más de dos activos se rechaza hasta resolver membresías.
+Se añadió política pura `evaluateGroupModeChange` y 12 pruebas node:test sobre
+conversiones, cardinalidad, autorización confiable, revisión, no-op e inmutabilidad.
+Revisión independiente Sol: sin defectos bloqueantes; cobertura de casos faltantes
+añadida. `npm test`: build correcto, 16/17 pruebas pasan; la integración PostgreSQL
+no pudo conectar con `127.0.0.1:55432`. Las pruebas unitarias no acreditan
+persistencia, atomicidad, replay offline ni autorización HTTP. T-005 sigue en
+progreso; CA-I2-11 a CA-I2-17 completos siguen pendientes.

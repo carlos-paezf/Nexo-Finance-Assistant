@@ -56,15 +56,21 @@ históricos (RF-040–052; RB-001–003; RNF-042). La salida de un miembro conse
 sus datos personales y trazabilidad; acceso posterior a históricos compartidos,
 retención y eliminación requieren regla explícita.
 
-La transición es atómica y condicionada a una revisión esperada del grupo. Una
-revisión obsoleta produce conflicto visible, no sobrescritura. Una clave de
-idempotencia estable devuelve el mismo resultado en reintentos; la misma clave
-con contenido distinto se rechaza. La cola offline expresa intención pendiente;
-al sincronizar se revalidan identidad, permisos, miembros y revisión. Rechazos
-permanecen para corrección y no se muestran como sincronizados. PAREJA→FAMILIA
-requiere invitación y aceptación autenticada de nuevos miembros. FAMILIA→PAREJA
-no expulsa ni elimina integrantes automáticamente: si sobran integrantes, bloquea
-la conversión hasta resolver explícitamente quién permanece y el destino de los
-demás. Estos mecanismos son propuestas de seguridad/integridad; límites de
-cardinalidad familiar y tratamiento de históricos de miembros salientes siguen
-pendientes de aprobación.
+Propuesta experimental para T-005: cambio de tipo y modificación de membresía
+son operaciones separadas. La transición de tipo es atómica y condicionada a una
+revisión esperada; una revisión obsoleta produce conflicto visible. PAREJA→FAMILIA
+conserva las membresías activas actuales y no exige invitar de nuevo. Añadir
+miembros es una operación aparte y requiere invitación aceptada. PAREJA admite
+como máximo dos miembros activos; FAMILIA puede conservar dos y admite más, sin
+máximo definido aquí. FAMILIA→PAREJA con más de dos miembros activos se rechaza
+hasta resolver explícitamente las membresías para quedar en cardinalidad válida;
+no se expulsa ni elimina a nadie automáticamente.
+
+También son propuestas experimentales: clave de idempotencia estable para
+reintentos, rechazo de la misma clave con contenido distinto y revalidación de
+identidad, permisos, membresías y revisión al reproducir la cola offline. La
+política pura de PoC no demuestra atomicidad, persistencia, autorización HTTP ni
+idempotencia de extremo a extremo. El backend debe autorizar cada lectura y
+escritura por actor, grupo, recurso, acción y permiso vigente. Las reglas de
+producción, cardinalidad familiar y tratamiento de históricos de miembros
+salientes siguen pendientes de aprobación.
