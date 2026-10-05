@@ -119,3 +119,32 @@ cifrado, segundo plano, energía y rendimiento. Flutter + NestJS/TypeScript +
 PostgreSQL/Prisma sigue siendo preferencia para la PoC; DEC-004, versiones
 productivas, validación técnica completa y aprobación del MVP continúan
 pendientes. Solo se usaron datos sintéticos.
+
+## Seguimiento T-005 — integración de Privacidad y uso — 5 de octubre de 2026
+
+Integrados en `feat/t005-runtime-validation` los archivos de referencia del
+commit fuente `545bfa24378cb1ee4641683b831fc7c64ccfec2a`. En `main.dart` solo se
+añadieron el import y el acceso desde el AppBar. No cambiaron validadores,
+corrección de rechazos HTTP 400/409, sincronización, URL de API, almacenamiento
+local ni dependencias/lockfiles.
+
+Verificación real en Flutter Windows: `flutter analyze` sin issues y `flutter
+test` 12/12. Los tests nuevos pasan apertura sin cuenta cuando falla el
+almacenamiento; y texto al 200% en viewport 360×800, controles accesibles y
+apertura de `LicensePage`. Se ajustó el desplazamiento del test fuente, que
+inicialmente intentaba tocar un encabezado fuera del viewport. Build Release
+Windows exitoso. La instancia PID 24124 quedó abierta en Privacidad y uso con
+un directorio vacío e independiente. Captura y log locales (ignorados):
+`poc/.runtime/privacy-use-window.png` y
+`poc/.runtime/privacy-use-windows-validation.log`.
+
+Arranque reproducible de la instancia actual:
+
+```powershell
+$env:NEXO_DATA_DIRECTORY = 'D:\Nexus\poc\.runtime\privacy-use-b6cb9cb59e624046b3789d99f3b9a71d'
+& 'D:\Nexus\poc\flutter_offline\build\windows\x64\runner\Release\nexo_offline_poc.exe'
+```
+
+T-005 continúa en progreso. La pantalla es informativa, no captura aceptación;
+cumplimiento, documentos productivos, accesibilidad integral y validación móvil
+siguen pendientes.

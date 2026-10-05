@@ -202,3 +202,34 @@ permanecen abiertas.
 Conventional Commits del PR #1. T-005 sigue en progreso mientras falten
 experimentos móviles físicos/nativos. Stack productivo, versiones, DEC-004 y
 alcance del MVP siguen pendientes. Datos sintéticos solamente.
+
+## 5 de octubre de 2026 — integración Windows de Privacidad y uso
+
+Se recuperaron los tres archivos de referencia del commit fuente
+`545bfa24378cb1ee4641683b831fc7c64ccfec2a`. `main.dart` conserva intactos sus
+flujos de cuenta, validación financiera, rechazos, cola y sincronización; solo
+incorpora el import y una acción de AppBar que abre la pantalla informativa.
+El documento 11 quedó enlazado desde el índice. Sin dependencias nuevas ni
+cambios a `pubspec.yaml`/lockfiles.
+
+`flutter analyze`: sin issues. `flutter test`: 12/12, incluyendo cuenta
+inexistente con almacenamiento fallido, lectura a escala 200% en 360×800 y
+apertura del visor de licencias. El test del 200% necesitó `ensureVisible` para
+no pulsar fuera de viewport y liberar SemanticsHandle antes de acabar.
+`flutter build windows --release --dart-define=NEXO_API_URL=http://127.0.0.1:3011`
+pasó. La ejecución visual Release (PID 24124) abrió la pantalla desde el AppBar
+sin cuenta y conserva la ventana abierta. Datos en carpeta independiente; API
+existente y otras instancias quedaron intactas. Captura/log locales ignorados:
+`poc/.runtime/privacy-use-window.png` y
+`poc/.runtime/privacy-use-windows-validation.log`.
+
+Comando para reabrir la misma instancia:
+
+```powershell
+$env:NEXO_DATA_DIRECTORY = 'D:\Nexus\poc\.runtime\privacy-use-b6cb9cb59e624046b3789d99f3b9a71d'
+& 'D:\Nexus\poc\flutter_offline\build\windows\x64\runner\Release\nexo_offline_poc.exe'
+```
+
+T-005 permanece abierta. La pantalla no representa conformidad ni aprobación
+productiva; faltan los experimentos móviles y la revisión legal/accesibilidad
+integral.

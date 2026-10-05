@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'api_client.dart';
 import 'local_data.dart';
 import 'money.dart';
+import 'privacy_use_page.dart';
 
 void main() => runApp(const NexoPocApp());
 
@@ -181,7 +182,20 @@ class _LedgerPageState extends State<LedgerPage> {
   Widget build(BuildContext context) {
     final repository = _repository;
     return Scaffold(
-      appBar: AppBar(title: const Text('Nexo · prueba sin conexión')),
+      appBar: AppBar(
+        title: const Text('Nexo · prueba sin conexión'),
+        actions: [
+          IconButton(
+            tooltip: 'Privacidad y uso',
+            icon: const Icon(Icons.privacy_tip_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const PrivacyUsePage(),
+              ),
+            ),
+          ),
+        ],
+      ),
       body: _busy && repository == null
           ? const Center(
               child:
