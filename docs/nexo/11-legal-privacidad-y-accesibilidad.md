@@ -297,6 +297,11 @@ Revisar los doce apartados con/sin cuenta, API apagada, teclado, zoom del sistem
 y Narrator. La ejecución visual Flutter no se acredita desde esta sesión.
 T-005 sigue en progreso. Consumo de tokens atribuible: N/D.
 
+Código y documentos: commit [`d8126d9`](https://github.com/carlos-paezf/Nexo-Finance-Assistant/commit/d8126d9b2a56281a03dfecc017c28e0f048c7562)
+— `feat(poc): add privacy and usage information`, [PR #2 en borrador](https://github.com/carlos-paezf/Nexo-Finance-Assistant/pull/2),
+base `feat/t005-runtime-validation`. Integración con la iteración local pendiente;
+no se fusionó la rama ni se publicó una app.
+
 ## Puerta de publicación
 
 La revisión queda abierta hasta completar el responsable/contacto, los textos

@@ -218,6 +218,9 @@ WCAG 2.2 y documentación Flutter de accesibilidad. Enlaces y criterios en 11.
 El alcance Colombia/plataformas futuras requiere reevaluación según países y
 funciones habilitados; cookies, anuncios y ubicación no están implementados.
 
-Notion: página 11 creada bajo el proyecto y T-011 incorporada al plan; cierre
-documental de publicación se registra tras obtener commit y PR reales. T-005,
-T-009/T-011, revisión jurídica, textos productivos y selección/MVP pendientes.
+Notion: página 11 creada bajo el proyecto y T-011 incorporada al plan.
+Publicación: [`d8126d9b2a56281a03dfecc017c28e0f048c7562`](https://github.com/carlos-paezf/Nexo-Finance-Assistant/commit/d8126d9b2a56281a03dfecc017c28e0f048c7562)
+— `feat(poc): add privacy and usage information`. [PR #2 en borrador](https://github.com/carlos-paezf/Nexo-Finance-Assistant/pull/2)
+contra `feat/t005-runtime-validation`; no fusionado. La conciliación con la
+iteración local sigue pendiente. T-005, T-009/T-011, revisión jurídica, textos
+productivos y selección/MVP conservan sus estados pendientes.

@@ -116,3 +116,8 @@ y confirmó por inspección. La vista de referencia del chat no ejecuta Flutter;
 su estructura se comprobó, pero no pudo renderizarse con Playwright por falta
 del binario de navegador. El flujo visual real se debe revisar en Windows con
 los comandos del README. T-005, DEC-004 y MVP conservan sus estados pendientes.
+
+Publicación: commit [`d8126d9`](https://github.com/carlos-paezf/Nexo-Finance-Assistant/commit/d8126d9b2a56281a03dfecc017c28e0f048c7562)
+— `feat(poc): add privacy and usage information`; [PR #2 en borrador](https://github.com/carlos-paezf/Nexo-Finance-Assistant/pull/2),
+contra `feat/t005-runtime-validation`. No se fusionó ni se cambió la rama de
+la iteración local; conciliar ambas al finalizarla.
