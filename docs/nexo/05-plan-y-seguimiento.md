@@ -18,6 +18,7 @@ Documentación inicial completada. Especificación detallada e implementación p
 - [ ] T-008 — Definir métricas de calidad, carga de referencia, recuperación y política de retención.
 - [ ] T-009 — Validar permisos, proveedores, protección de datos y alcance de información financiera externa antes del lanzamiento.
 - [ ] T-010 — Crear estrategia de pruebas de motor financiero, privacidad, deduplicación y soporte.
+- [ ] T-011 — Completar los doce controles legales, licencias, tiendas y accesibilidad de [11](11-legal-privacidad-y-accesibilidad.md). En progreso: documentación y pantalla de PoC; textos productivos, decisiones y verificación pendientes.
 ## Secuencia propuesta
 1. Cerrar alcance, reglas y permisos.
 2. Construir núcleo: usuarios, cuentas, movimientos, finanzas compartidas, presupuestos y metas.
@@ -91,3 +92,27 @@ Comandos reproducibles en los README de [`poc/api`](../../poc/api/README.md) y
 Implementación y documentación publicadas en la rama
 [`feat/t005-runtime-validation`](https://github.com/carlos-paezf/Nexo-Finance-Assistant/tree/feat/t005-runtime-validation),
 commit `eb12ebea0615a33f4a0e09bb3781c86c03fb0c14`.
+
+## Seguimiento legal — 5 de octubre de 2026
+
+Solicitud del usuario: validar y aplicar doce temas legales, privacidad,
+permisos, mercados y accesibilidad. Se auditaron catálogo y PoC publicada en
+`f1ada910bb6b4912201a9e2d0941f01b0283dc43`. Los temas ya existentes se vinculan
+a sus RF/RNF; los faltantes tienen controles C-01 a C-12 en
+[11](11-legal-privacidad-y-accesibilidad.md) y
+[Notion](https://app.notion.com/p/3f0af67c2e9281cf9f2ed4e6fe3b7bdb).
+
+Rama separada `feat/legal-privacy-accessibility`, desde la base publicada, para
+evitar interferir con la iteración local de validadores/sincronización.
+Implementación: pantalla Privacidad y uso antes de crear cuenta y visor nativo
+de licencias; no cambia flujos financieros ni añade dependencias. Borradores
+productivos, titularidad/licencia, responsable/contacto y publicación pendientes.
+Markets se contempla como tiendas y explorador financiero.
+
+T-011 y T-009 siguen abiertas. Dos pruebas widget nuevas están escritas sin
+ejecutar: no hay Flutter/Dart en esta sesión. La revisión independiente Sol
+detectó un finder de desplazamiento ambiguo en la prueba al 200%; se corrigió
+y confirmó por inspección. La vista de referencia del chat no ejecuta Flutter;
+su estructura se comprobó, pero no pudo renderizarse con Playwright por falta
+del binario de navegador. El flujo visual real se debe revisar en Windows con
+los comandos del README. T-005, DEC-004 y MVP conservan sus estados pendientes.

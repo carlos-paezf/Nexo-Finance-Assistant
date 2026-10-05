@@ -18,6 +18,7 @@ Etapa: levantamiento y especificación inicial. No hay MVP o tecnologías aproba
 | [08-propuesta-mvp-y-depuracion.md](08-propuesta-mvp-y-depuracion.md) | Borrador T-001/T-002: cobertura RF y decisiones | [Resumen en Notion](https://app.notion.com/p/3eeaf67c2e92813aba56cfcb45d9032b) |
 | [09-primer-incremento-y-validacion.md](09-primer-incremento-y-validacion.md) | Aceptación futura para I1 e I2 | [Resumen en Notion](https://app.notion.com/p/3eeaf67c2e9281a4b0a2d95048294864) |
 | [10-evaluacion-tecnologia-movil.md](10-evaluacion-tecnologia-movil.md) | Comparación móvil y plan de PoC | [Resumen en Notion](https://app.notion.com/p/3eeaf67c2e928192a41ae2675e247371) |
+| [11-legal-privacidad-y-accesibilidad.md](11-legal-privacidad-y-accesibilidad.md) | Auditoría de doce temas, políticas de PoC y criterios de publicación | [Notion](https://app.notion.com/p/3f0af67c2e9281cf9f2ed4e6fe3b7bdb) |
 
 ## Estado para arrancar
 - Confirmados: aprendizaje de recomendaciones, explorador de ahorro/inversión y

@@ -31,6 +31,19 @@ El test requiere `node` en PATH, `.env` de API apuntando a la base exclusiva de 
 
 ## Flujo implementado
 
+La barra superior permite abrir **Privacidad y uso**, incluso sin cuenta o si
+falla el almacenamiento. Sus doce apartados describen datos, condiciones,
+permisos, derechos, licencias, cookies, publicidad, ubicación, markets y
+accesibilidad del prototipo. El visor **Licencias de componentes** usa Flutter;
+no incluye dependencias backend. No registra aceptación ni autorización.
+Textos productivos y revisión: [11 — Legal, privacidad y accesibilidad](../../docs/nexo/11-legal-privacidad-y-accesibilidad.md).
+
+Las pruebas nuevas de esta pantalla están escritas en
+`test/privacy_use_page_test.dart` y requieren ejecución con Flutter. Los
+resultados anteriores de Windows descritos abajo corresponden al commit base,
+no validan esta extensión. Para verla, ejecuta el comando Windows anterior y
+abre el icono de privacidad. Revisa también texto del sistema al 200% y teclado.
+
 - Cuenta y cola de operaciones local, con ID estable creado antes de sincronizar.
 - Movimientos en centavos enteros; el contrato HTTP envía centavos como cadenas para evitar precisión `number` en JavaScript.
 - Cuenta primero, luego sus movimientos; si falla la cuenta, movimientos permanecen en cola.

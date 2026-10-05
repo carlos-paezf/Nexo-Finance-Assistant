@@ -172,3 +172,52 @@ Rama publicada para revisión: [feat/t005-runtime-validation](https://github.com
 Commit de implementación/documentación: `eb12ebea0615a33f4a0e09bb3781c86c03fb0c14` —
 `test(poc): validate offline flow on Windows`. La rama quedó configurada para
 seguir `origin/feat/t005-runtime-validation`; no se abrió PR.
+
+## 5 de octubre de 2026 — Legal, privacidad y accesibilidad
+
+El usuario solicitó comprobar e incorporar doce temas: privacidad/datos,
+términos, propiedad intelectual, permisos, licencias, cookies, publicidad,
+derechos propios/de terceros, funcionalidades lícitas, geolocalización,
+markets y accesibilidad. Se inspeccionó la base publicada
+`f1ada910bb6b4912201a9e2d0941f01b0283dc43`, incluidos catálogos y lockfiles.
+Privacidad, permisos, independencia comercial y accesibilidad ya tenían
+cobertura parcial; faltaban documentos/control explícito para los demás temas.
+No había LICENSE de Nexo ni centro de información en la app.
+
+Se añadió [11 — Legal, privacidad y accesibilidad](11-legal-privacidad-y-accesibilidad.md)
+con matriz C-01 a C-12, inventarios de datos/permisos, textos informativos,
+borradores productivos y condiciones de publicación. Las licencias declaradas
+en el lockfile backend se distinguen de una revisión de textos/NOTICE aún
+pendiente. No se inventó responsable, correo, titularidad o licencia ni se
+registró un consentimiento. Línea base de 238 requisitos y MVP sin cambios.
+
+Flutter incorpora una ruta Privacidad y uso accesible antes de crear cuenta
+y sin consulta de red, más `showLicensePage` para avisos registrados en la
+compilación. Conserva Material 3 y paleta/ancho existentes, sin dependencias
+nuevas y sin editar persistencia, importes, sincronización, API o migración.
+Ponytail e Impeccable aplicados; context de Impeccable ejecutado sobre el código
+existente (sin PRODUCT.md/DESIGN.md). Se trabajó en la rama separada
+`feat/legal-privacy-accessibility` para no modificar la iteración local en curso.
+
+Verificación: doce temas de pantalla y doce controles documentales presentes;
+`git diff --check` pasó; revisión independiente `gpt-6.1-sol` corrigió un finder
+ambiguo de Scrollable en el test ampliado y confirmó el arreglo por inspección.
+Las dos pruebas widget nuevas, analyzer, build e instancia Flutter **no se
+ejecutaron** por ausencia de SDK Flutter/Dart. No se atribuyen resultados 5/5
+previos a esta revisión. Vista interactiva de referencia preparada para el chat,
+con estructura HTML comprobada; render Playwright intentado sin éxito porque
+falta el binario Chromium, no se afirma verificación visual de esa referencia.
+No se instalaron SDK ni navegadores. No hay verificación Narrator/TalkBack/VoiceOver
+ni conformidad WCAG o jurídica acreditada. No se ejecutó npm test/audit: backend
+y lockfiles no cambian. Tokens atribuibles de la tarea: N/D.
+
+Fuentes oficiales consultadas: Ley 1581 y Decreto 1074 (protección de datos),
+Ley 1480 (información/consumo/publicidad), DNDA (software/titularidad), Google
+Play (User Data/declaración financiera/Financial Services), Apple App Review,
+WCAG 2.2 y documentación Flutter de accesibilidad. Enlaces y criterios en 11.
+El alcance Colombia/plataformas futuras requiere reevaluación según países y
+funciones habilitados; cookies, anuncios y ubicación no están implementados.
+
+Notion: página 11 creada bajo el proyecto y T-011 incorporada al plan; cierre
+documental de publicación se registra tras obtener commit y PR reales. T-005,
+T-009/T-011, revisión jurídica, textos productivos y selección/MVP pendientes.
