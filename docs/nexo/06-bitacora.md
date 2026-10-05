@@ -372,3 +372,35 @@ atomicidad real, autorización HTTP, replay ni idempotencia extremo a extremo.
 Sin cambios Flutter/UI ni rebuild; al comprobar no se encontró proceso Nexo de
 la PoC en ejecución, y no se cerró ninguna instancia.
 T-005 y CA-I2-11 a CA-I2-17 siguen en progreso/pendientes de integración.
+
+## 5 de octubre de 2026 — recuperación PostgreSQL y validación visual Windows
+
+El fallo anterior de `npm test` fue causado por el clúster detenido, no por las
+pruebas. Se verificó el clúster PostgreSQL 17.6 en `poc/.runtime/postgres-data`,
+la ruta/binarios registrados en `postmaster.opts`, SQL real sobre la base
+sintética y esquema vigente (1 migración, al día). `pg_ctl` arrancó ese mismo
+clúster en `127.0.0.1:55432`; no se borró el PID residual, no se reinitializó el
+directorio y no se tocó el servicio PostgreSQL ajeno. El comando exacto quedó en
+`poc/api/README.md`. DATABASE_URL se leyó del `.env` local solo para procesos; no
+se divulgó.
+
+`npm test` pasó 17/17 sin skips; la integración contra PostgreSQL real verificó
+saldo `10765433` centavos después de reiniciar API, dos movimientos, diez
+reintentos idempotentes y HTTP 409 al reutilizar ID con contenido distinto.
+La integración Flutter Windows pasó 1/1: cuenta COP 1.000,00, ingreso COP
+200,00, gasto COP 12,34 y saldo API COP 1.187,66. Se compiló Release con
+`NEXO_API_URL=http://127.0.0.1:3011`; API PID 94168 y ventana PID 94816 quedan
+abiertas. El directorio independiente de datos sintéticos es
+`D:\Nexus\poc\.runtime\t005-runtime-recovery-20261005-6f3a`.
+Comando de comprobación: desde `poc/flutter_offline`,
+`flutter test integration_test/finance_flow_test.dart -d windows
+--dart-define=NEXO_API_URL=http://127.0.0.1:3011`; Release se recompiló con
+`flutter build windows --release --dart-define=NEXO_API_URL=http://127.0.0.1:3011`
+y se dejó abierta `build/windows/x64/runner/Release/nexo_offline_poc.exe` con
+`NEXO_DATA_DIRECTORY` apuntando a ese directorio. El API se inició desde
+`poc/api` con `PORT=3011`, `DATABASE_URL` de `.env` y `node dist/src/main.js`.
+
+Alcance: esta ejecución valida Windows y PostgreSQL local; no acredita Android.
+La política PAREJA/FAMILIA mantiene solo cobertura unitaria parcial; no se han
+validado persistencia, atomicidad, replay ni autorización HTTP de grupos. T-005
+permanece en progreso.

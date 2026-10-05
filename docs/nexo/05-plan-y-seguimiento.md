@@ -287,3 +287,43 @@ añadida. `npm test`: build correcto, 16/17 pruebas pasan; la integración Postg
 no pudo conectar con `127.0.0.1:55432`. Las pruebas unitarias no acreditan
 persistencia, atomicidad, replay offline ni autorización HTTP. T-005 sigue en
 progreso; CA-I2-11 a CA-I2-17 completos siguen pendientes.
+
+## Seguimiento T-005 — recuperación PostgreSQL y runtime Windows — 5 de octubre de 2026
+
+Antecedente conservado: el primer `npm test` de esta iteración falló al no
+conectar con `127.0.0.1:55432`. Se recuperó, sin reinitializar, el clúster
+PostgreSQL 17.6 existente `poc/.runtime/postgres-data`; `pg_ctl status` y SQL
+confirmaron servicio real, y `prisma migrate status` informó 1 migración al día.
+El comando reproducible está en `poc/api/README.md`. Credenciales se tomaron del
+`.env` local mediante variables de proceso y no se imprimieron.
+
+Después, `npm test` compiló y pasó 17/17: 4 pruebas financieras, 12 de política
+de grupo y la integración HTTP/PostgreSQL sin omisión. Esta última confirmó
+saldo persistido `10765433` centavos, 2 movimientos, reinicio de API, diez
+reintentos sin duplicado y HTTP 409 para el mismo ID con contenido distinto.
+`flutter test integration_test/finance_flow_test.dart -d windows
+--dart-define=NEXO_API_URL=http://127.0.0.1:3011` pasó 1/1; flujo UI sintético
+creó cuenta COP 1.000,00, ingreso COP 200,00, gasto COP 12,34 y confirmó por API
+saldo COP 1.187,66.
+
+Se recompiló Release y quedó abierta la API compilada en `127.0.0.1:3011` (PID
+94168) y la ventana Windows (PID 94816). Datos locales nuevos: `poc/.runtime/
+t005-runtime-recovery-20261005-6f3a`. Windows no valida Android. T-005 sigue
+en progreso; los criterios completos de grupos siguen pendientes.
+
+Comandos de esta ejecución (DATABASE_URL se carga del `.env` local sin mostrarlo):
+
+```powershell
+Set-Location D:\Nexus\poc\api
+$line = Get-Content .env | Where-Object { $_ -match '^DATABASE_URL=' } | Select-Object -First 1
+$env:DATABASE_URL = $line.Substring('DATABASE_URL='.Length)
+$env:PORT = '3011'
+Start-Process -FilePath (Get-Command node).Source -ArgumentList 'dist/src/main.js' -WorkingDirectory (Get-Location).Path -WindowStyle Hidden
+
+Set-Location D:\Nexus\poc\flutter_offline
+$env:NEXO_API_WORKDIR = (Resolve-Path ..\api).Path
+$env:NEXO_DATA_DIRECTORY = 'D:\Nexus\poc\.runtime\t005-runtime-recovery-20261005-6f3a'
+& 'D:\Nexus\poc\.runtime\flutter\bin\flutter.bat' test integration_test/finance_flow_test.dart -d windows --dart-define=NEXO_API_URL=http://127.0.0.1:3011
+& 'D:\Nexus\poc\.runtime\flutter\bin\flutter.bat' build windows --release --dart-define=NEXO_API_URL=http://127.0.0.1:3011
+& '.\build\windows\x64\runner\Release\nexo_offline_poc.exe'
+```

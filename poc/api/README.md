@@ -22,6 +22,21 @@ npm test
 npm start
 ```
 
+En este entorno Windows, el clúster PostgreSQL 17.6 existente de la PoC está en
+`D:\Nexus\poc\.runtime\postgres-data` y escucha solo en `127.0.0.1:55432`.
+Para arrancar ese clúster conservando sus datos y configuración, desde PowerShell:
+
+```powershell
+& 'C:\Program Files\PostgreSQL\17\bin\pg_ctl.exe' start `
+  -D 'D:\Nexus\poc\.runtime\postgres-data' `
+  -l 'D:\Nexus\poc\.runtime\postgres.log' `
+  -o '-h 127.0.0.1 -p 55432' -w
+```
+
+La orden inicia el directorio existente; no inicializa ni sustituye el clúster.
+El archivo `.env` local de esta PoC apunta a la base sintética exclusiva y no se
+versiona. No imprimir ni copiar sus credenciales a logs.
+
 `npm test` compila y ejecuta pruebas de servicio más la integración HTTP/PostgreSQL. La integración se omite si falta `DATABASE_URL`; con base disponible levanta y reinicia un proceso NestJS, verifica reintentos, saldo y conflicto, y limpia la cuenta sintética. `npm run test:postgres` ejecuta solo esa integración. La conexión local del ejemplo solo es para desarrollo.
 
 ## Contrato
