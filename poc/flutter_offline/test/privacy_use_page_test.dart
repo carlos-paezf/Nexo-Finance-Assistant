@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,6 +8,33 @@ import 'package:nexo_offline_poc/main.dart';
 import 'package:nexo_offline_poc/privacy_use_page.dart';
 
 void main() {
+  Future<ThemeData> nexoTheme(WidgetTester tester) async {
+    await tester.pumpWidget(NexoPocApp(
+      supportDirectoryProvider: () async =>
+          throw const FileSystemException('Almacenamiento no disponible'),
+    ));
+    return tester.widget<MaterialApp>(find.byType(MaterialApp)).theme!;
+  }
+
+  Future<void> pumpPrivacyPage(
+    WidgetTester tester, {
+    required ThemeData theme,
+    required double textScale,
+    Object instance = 'default',
+  }) async {
+    await tester.pumpWidget(MaterialApp(
+      key: ValueKey('$textScale-$instance'),
+      theme: theme,
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context)
+            .copyWith(textScaler: TextScaler.linear(textScale)),
+        child: child!,
+      ),
+      home: const PrivacyUsePage(),
+    ));
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('la información se abre sin cuenta ni almacenamiento disponible',
       (tester) async {
     await tester.pumpWidget(NexoPocApp(
@@ -145,16 +173,13 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     final semantics = tester.ensureSemantics();
     try {
-      await tester.pumpWidget(MaterialApp(
-        theme: ThemeData(useMaterial3: true),
-        builder: (context, child) => MediaQuery(
-          data:
-              MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(2)),
-          child: child!,
-        ),
-        home: const PrivacyUsePage(),
-      ));
-      await tester.pumpAndSettle();
+      final theme = await nexoTheme(tester);
+      await pumpPrivacyPage(
+        tester,
+        theme: theme,
+        textScale: 2,
+        instance: 'text-200',
+      );
       final outerScrollable = find.descendant(
         of: find.byType(PrivacyUsePage),
         matching: find.byType(Scrollable),
@@ -197,59 +222,94 @@ void main() {
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
     final semantics = tester.ensureSemantics();
     try {
-      for (final scale in [1.0, 2.0]) {
-        await tester.pumpWidget(MaterialApp(
-          theme: ThemeData(
-            useMaterial3: true,
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xFF176B55),
-              surface: const Color(0xFFF8FAF8),
-            ),
-            scaffoldBackgroundColor: const Color(0xFFF8FAF8),
-            inputDecorationTheme: const InputDecorationTheme(
-              border: OutlineInputBorder(),
-            ),
-          ),
-          builder: (context, child) => MediaQuery(
-            data: MediaQuery.of(context)
-                .copyWith(textScaler: TextScaler.linear(scale)),
-            child: child!,
-          ),
-          home: const PrivacyUsePage(),
-        ));
-        await tester.pumpAndSettle();
-        final scrollable = find.descendant(
+      final theme = await nexoTheme(tester);
+      Future<void> checkGuidelines() async {
+        for (final guideline in [
+          textContrastGuideline,
+          labeledTapTargetGuideline,
+          androidTapTargetGuideline,
+          iOSTapTargetGuideline,
+        ]) {
+          await expectLater(tester, meetsGuideline(guideline));
+        }
+      }
+
+      Future<Finder> pumpPage(double scale, Object instance) async {
+        await pumpPrivacyPage(
+          tester,
+          theme: theme,
+          textScale: scale,
+          instance: instance,
+        );
+        return find.descendant(
           of: find.byType(PrivacyUsePage),
           matching: find.byType(Scrollable),
         ).first;
-        final accessibilityTitle = find.text('Requisitos de accesibilidad');
-        await tester.scrollUntilVisible(
-          accessibilityTitle,
-          220,
-          scrollable: scrollable,
-        );
-        await tester.pumpAndSettle();
-        await tester.tap(accessibilityTitle);
-        await tester.pumpAndSettle();
-        for (final guideline in [
-          textContrastGuideline,
-          labeledTapTargetGuideline,
-          androidTapTargetGuideline,
-          iOSTapTargetGuideline,
-        ]) {
-          await expectLater(tester, meetsGuideline(guideline));
+      }
+
+      Future<void> reveal(Finder target, Finder scrollable) async {
+        for (var i = 0; i < 80 && target.evaluate().isEmpty; i++) {
+          await tester.drag(scrollable, const Offset(0, -220));
+          await tester.pumpAndSettle();
         }
+        expect(target, findsOneWidget);
+        await tester.ensureVisible(target);
+        await tester.pumpAndSettle();
+      }
+
+      for (final scale in [1.0, 2.0]) {
+        var scrollable = await pumpPage(scale, 'initial');
+        await checkGuidelines();
+        final viewport = Offset.zero &
+            (tester.view.physicalSize / tester.view.devicePixelRatio);
+        for (var index = 0; index < privacyUseSections.length; index++) {
+          final section = privacyUseSections[index];
+          scrollable = await pumpPage(scale, 'section-$index');
+          final title = find.text(section.$1);
+          final tile = find.ancestor(
+            of: title,
+            matching: find.byType(ExpansionTile),
+          );
+          final header = find.descendant(
+            of: tile,
+            matching: find.byType(ListTile),
+          );
+          await reveal(header, scrollable);
+          expect(
+            tester.getRect(header).overlaps(tester.getRect(scrollable)),
+            isTrue,
+          );
+          expect(tester.getRect(header).overlaps(viewport), isTrue);
+          final collapsedHint =
+              tester.getSemantics(title).getSemanticsData().hint;
+          tester.binding.renderViews.first.owner!.semanticsOwner!.performAction(
+            tester.getSemantics(title).id,
+            ui.SemanticsAction.tap,
+          );
+          await tester.pumpAndSettle();
+          expect(
+            tester.getSemantics(title).getSemanticsData().hint,
+            isNot(collapsedHint),
+          );
+          final content = find.text(section.$2);
+          expect(content, findsOneWidget);
+          expect(find.byType(SelectableText), findsOneWidget);
+          await Scrollable.ensureVisible(
+            tester.element(content),
+            alignment: 0.25,
+          );
+          await tester.pumpAndSettle();
+          expect(tester.getRect(content).overlaps(viewport), isTrue);
+          await checkGuidelines();
+          expect(tester.takeException(), isNull);
+        }
+
+        scrollable = await pumpPage(scale, 'licenses');
         final licenses = find.text('Licencias de componentes');
-        await tester.scrollUntilVisible(licenses, 220, scrollable: scrollable);
-        await tester.pumpAndSettle();
-        for (final guideline in [
-          textContrastGuideline,
-          labeledTapTargetGuideline,
-          androidTapTargetGuideline,
-          iOSTapTargetGuideline,
-        ]) {
-          await expectLater(tester, meetsGuideline(guideline));
-        }
+        await reveal(licenses, scrollable);
+        expect(tester.getRect(licenses).overlaps(viewport), isTrue);
+        await checkGuidelines();
+        expect(tester.takeException(), isNull);
       }
     } finally {
       semantics.dispose();

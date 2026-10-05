@@ -322,6 +322,29 @@ y revisión técnica/jurídica; no marcar cumplimiento por existir esta pantalla
 
 ## Evidencia vigente — integración en T-005 — 5 de octubre de 2026
 
+### Actualización — cobertura completa y lectores de pantalla
+
+En la iteración del 5 de octubre de 2026, la prueba de escala y guías obtiene
+el `ThemeData` de `NexoPocApp`; no mantiene una paleta duplicada. Con viewport
+360×800, ejecuta la vista inicial, cada una de las 12 secciones expandida de
+forma aislada y el botón de licencias, a 100% y 200%. Recorre el contenido
+visible y aplica en cada estado `textContrastGuideline`,
+`labeledTapTargetGuideline`, `androidTapTargetGuideline` e
+`iOSTapTargetGuideline`. Resultado: prueba widget aprobada. `flutter analyze`
+sin issues y `flutter test` 14/14. Esto no equivale a validación en un lector de
+pantalla nativo, dispositivos móviles o conformidad WCAG integral.
+
+Narrator queda pendiente: al comprobar el entorno, el proceso Narrator no
+estaba activo y tampoco estaba ejecutándose la instancia Windows de la PoC
+(incluido el PID previamente documentado 24124); por eso no se pudieron
+observar anuncios hablados, árbol UI Automation ni navegación con Narrator.
+Procedimiento manual: ejecutar el comando de instancia Release registrado
+abajo; iniciar Narrator con Win+Ctrl+Enter; recorrer con Tab y flechas desde el
+título; confirmar nombre/rol/estado expandido y orden de las 12 secciones;
+abrir “Licencias de componentes” con Enter y volver con Alt+Left o el control
+de retorno; anotar anuncios reales. La ausencia del lector activo es un
+bloqueo concreto, no un resultado aprobado.
+
 En `feat/t005-runtime-validation` se integró esta pantalla desde el AppBar de
 la PoC. La prueba automatizada ejecutada pasó apertura sin cuenta ante una
 excepción de almacenamiento, escala de texto 200% con ancho 360 px, guía de

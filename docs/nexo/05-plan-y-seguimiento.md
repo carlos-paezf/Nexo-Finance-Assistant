@@ -176,3 +176,22 @@ $env:NEXO_DATA_DIRECTORY = 'D:\Nexus\poc\.runtime\privacy-use-b6cb9cb59e624046b3
 T-005 permanece en progreso. Narrator/TalkBack/VoiceOver, dispositivos móviles,
 objetivos táctiles nativos y accesibilidad integral quedan pendientes. No se
 declara conformidad ni aprobación productiva.
+
+## Seguimiento T-005 — cobertura completa de Privacidad y uso — 5 de octubre de 2026
+
+La prueba de escala/guías ahora extrae el tema real de `NexoPocApp`, sin
+configuración duplicada. En 360×800 recorre la vista inicial, cada una de las
+12 secciones por separado con su contenido visible y el botón de licencias a
+100%/200%. Las cuatro guías Flutter de contraste, controles nombrados y
+objetivos Android/iOS se ejecutan en esos estados. Flutter Test pasó; el teclado
+se mantiene cubierto por su test existente. Verificación final desde
+`poc/flutter_offline`: `flutter analyze` sin issues; `flutter test` 14/14;
+`git diff --check` sin errores.
+
+Narrator no se pudo observar: no estaba activo y la instancia Windows previa
+(PID 24124) tampoco estaba ejecutándose al comprobarlo. Se conserva pendiente
+la validación manual de anuncios, nombre/rol/estado, orden y regreso desde
+licencias. Procedimiento y comando Release con carpeta de datos sintéticos
+independiente están documentados en C-12. Como no cambió la UI de producción,
+no se recompiló ni relanzó Windows. T-005 sigue en progreso; no se declara
+validación de lector nativo, móvil ni conformidad productiva.

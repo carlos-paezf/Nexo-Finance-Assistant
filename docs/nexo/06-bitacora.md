@@ -261,3 +261,26 @@ $env:NEXO_DATA_DIRECTORY = 'D:\Nexus\poc\.runtime\privacy-use-b6cb9cb59e624046b3
 T-005 continúa en progreso hasta completar los experimentos móviles, revisión
 con lectores de pantalla y controles de producción. El MVP y la conformidad
 productiva siguen pendientes.
+
+## 5 de octubre de 2026 — cobertura completa C-12 y revisión Narrator
+
+Se eliminó la paleta duplicada de la preparación de pruebas: la comprobación
+de escala y guías reutiliza el `ThemeData` extraído de `NexoPocApp`. Con ancho
+360 y escalas 100%/200%, el test comprueba vista inicial, 12/12 apartados
+expandidos de uno en uno con contenido visible, y botón de licencias. En esos
+estados se ejecutan `textContrastGuideline`, `labeledTapTargetGuideline`,
+`androidTapTargetGuideline` e `iOSTapTargetGuideline`; mantiene scroll
+explícito, verificación de excepciones y liberación del `SemanticsHandle`.
+Resultado real: `flutter analyze` sin issues; `flutter test` 14/14;
+`git diff --check` sin errores. Los tests de teclado siguen presentes.
+
+La inspección de Narrator quedó bloqueada porque Narrator no estaba activo y
+la instancia Windows previamente anotada (PID 24124) no estaba ejecutándose.
+No se observaron anuncios, UI Automation ni orden de lectura. Pasos manuales
+pendientes y comando de arranque Release con `NEXO_DATA_DIRECTORY` aislado:
+abrir la instancia registrada en C-12, iniciar Narrator con Win+Ctrl+Enter,
+recorrer título y secciones con teclado verificando nombre/rol/estado y orden,
+abrir licencias con Enter y volver comprobando el anuncio de retorno. Sin
+cambio de UI de producción, no fue necesario recompilar ni relanzar Windows.
+T-005 continúa en progreso; validación nativa, móvil y aprobación productiva
+siguen pendientes.
