@@ -1,10 +1,10 @@
-# 01 — Requisitos funcionales (163)
+# 01 — Requisitos funcionales (165; línea base histórica v0.2: 163)
 
 [Fuente en Notion](https://app.notion.com/p/3eeaf67c2e92814ba10ac103f880c628?pvs=204)
 
 ## Línea base v0.2
-**163 requisitos en 16 módulos.** Fuente: conversación de definición de Nexo proporcionada por el usuario. Redacción normalizada para consulta, conservando identificadores, contenido y prioridades.
-P0: propuesta para MVP; P1: evolución temprana; P2: evolución avanzada. Priorización pendiente de validación.
+**Catálogo vigente: 165 requisitos en 16 módulos.** La línea base histórica v0.2 conserva sus 163 requisitos; RF-164/165 son una adición aprobada por el usuario para elección de tipo de grupo y migración. Los 163 textos y prioridades originales no se alteran. Fuente: conversación de definición de Nexo proporcionada por el usuario. Redacción normalizada para consulta.
+P0: propuesta para MVP; P1: evolución temprana; P2: evolución avanzada. Priorización pendiente de validación. P0 en RF-164/165 es una propuesta de prioridad asociada al núcleo, no una prioridad confirmada.
 
 ## Usuarios y autenticación
 
@@ -253,6 +253,8 @@ P0: propuesta para MVP; P1: evolución temprana; P2: evolución avanzada. Priori
 | RF-142 | El sistema deberá permitir: Distribución entre múltiples participantes. | P2 |
 | RF-143 | El sistema deberá permitir: Perfiles dependientes con acceso limitado. | P2 |
 | RF-144 | El sistema deberá permitir: Metas familiares y aportaciones múltiples. | P2 |
+| RF-164 | El sistema deberá permitir elegir el tipo PAREJA o FAMILIA al crear y configurar un grupo. | P0 |
+| RF-165 | El sistema deberá permitir migrar un grupo entre PAREJA y FAMILIA en ambos sentidos, conservando su identidad e historial y exigiendo resolución explícita de miembros cuando la conversión a PAREJA exceda su cardinalidad. | P0 |
 
 
 ## Administración y soporte

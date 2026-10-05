@@ -320,3 +320,32 @@ target Debug compiló y se ejecutó, y el inspector pasó en Release y probe.
 `git diff --check` pasó sin errores. App/tests no cambiaron, así que no se
 repitió flutter test. T-005 continúa en progreso; no se declara conformidad,
 aprobación productiva ni validación móvil.
+
+## 5 de octubre de 2026 — decisiones MVP, Android y grupos
+
+El usuario confirmó Android como primera versión y Flutter, NestJS/TypeScript y
+PostgreSQL/Prisma como base. Confirmó el núcleo MVP de finanzas personales y
+grupos PAREJA/FAMILIA desde el inicio, con migración en ambos sentidos. La
+confirmación no fija versiones ni prueba aptitud técnica/productiva; la
+aprobación formal del MVP permanece pendiente. T-005 sigue en progreso.
+
+Actualización de trazabilidad: el catálogo actual es 165 RF + 75 RNF (240), con
+163 RF + 75 RNF (238) preservados como línea base v0.2 histórica. Se añadieron
+RF-164 elección de tipo y RF-165 migración bilateral. Se mantiene el texto y
+prioridad original de los 163 RF; P0 en los nuevos IDs es propuesta. RNF-052 se
+actualizó para ambos tipos, sin inventar cardinalidad máxima de FAMILIA. La
+matriz quedó en 55 completos, 2 parciales y 108 diferidos; incluye RF-139/142 y
+RF-164/165, conserva diferidos RF-140/141/143/144 y deja RF-007 pendiente de
+depuración.
+
+Se especificó como propuesta un único modelo de grupo, autorización por recurso,
+históricos inmutables, resolución sin expulsión automática en FAMILIA→PAREJA,
+control de concurrencia, idempotencia y revalidación de cola offline. Revisión
+independiente documental: permisos, privacidad y riesgo de pérdida contrastados;
+no revisó código. Aún requieren decisión los límites familiares, acceso histórico
+de miembros salientes y políticas de retención/eliminación/exportación. CA-I2-11
+a CA-I2-17 definen pruebas futuras de tipo, ambas transiciones, acceso indebido,
+reintentos, concurrencia, reparto entre tres y preservación histórica; no se han
+ejecutado. Notion se sincronizó en las páginas enlazadas de RF/RNF, arquitectura,
+MVP, aceptación I1/I2, evaluación, plan y bitácora. La lectura de regreso confirmó
+contenido completo, sin truncamiento ni bloques desconocidos.

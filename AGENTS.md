@@ -1,17 +1,21 @@
 # Nexo — Trabajo con Codex
 
 ## Contexto
-App de finanzas personales/en pareja, evolución familiar y portal de soporte.
-Línea base v0.2: 163 RF + 75 RNF. El usuario prefiere Flutter, NestJS con
-TypeScript y PostgreSQL con Prisma como stack de referencia. MVP y selección
-productiva siguen pendientes.
+App de finanzas personales, grupos PAREJA/FAMILIA y portal de soporte.
+Línea base histórica v0.2: 163 RF + 75 RNF; catálogo vigente tras la decisión
+de modo y migración: 165 RF + 75 RNF. El usuario confirmó Android como primera
+plataforma y Flutter, NestJS con TypeScript y PostgreSQL con Prisma como base
+tecnológica. Confirmó MVP con finanzas personales y grupos PAREJA/FAMILIA desde
+el inicio, además de migración en ambos sentidos. Las versiones concretas,
+validación técnica completa y aprobación formal del MVP siguen pendientes.
 Notion: https://app.notion.com/p/3eeaf67c2e928135b4c6dd1d41f06290
 Lee docs/nexo/00-indice.md; abre solo los RF/RNF, reglas y decisiones afectados.
 Contrasta fuentes vigentes en Notion si está disponible; informa pendientes de
 sincronización sin afirmar lecturas o escrituras que no ocurrieron.
 Conserva los ID y separa decisiones confirmadas, propuestas y pendientes.
-La preferencia tecnológica no significa aprobación de DEC-004, versiones
-productivas, validación técnica completa ni alcance del MVP. Usa las versiones
+La base tecnológica y Android están confirmados por el usuario; esto no aprueba
+versiones productivas ni validación técnica completa. El alcance confirmado del
+MVP no cierra su aprobación formal ni las reglas propuestas aún pendientes. Usa las versiones
 de `poc/` solo para reproducir experimentos y registra evidencia, límites y
 pendientes antes de recomendar una decisión.
 

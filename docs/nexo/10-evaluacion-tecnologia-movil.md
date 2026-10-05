@@ -1,15 +1,15 @@
 # 10 — Evaluación de tecnología móvil
 
-**Recomendación provisional — 2 de octubre de 2026. DEC-004 sigue pendiente.**
+**Base confirmada por el usuario — 5 de octubre de 2026. Validación técnica pendiente.**
 Requisitos: RF-016, RF-018, RF-026 a RF-038; RNF-006, RNF-018, RNF-020 a RNF-025, RNF-051, RNF-057, RNF-059 a RNF-061.
 
 ## Recomendación
 
-Usar **Flutter como candidata para la prueba de concepto** del núcleo móvil offline y los adaptadores nativos de captura Android, conforme a la preferencia tecnológica registrada en Notion el 3 de octubre de 2026. La selección definitiva de móvil sigue pendiente en DEC-004. La documentación oficial ofrece patrones de datos locales/remotos y canales hacia código de plataforma; no prueba que sea más rápido, barato o seguro que Ionic.
+La primera versión será para **Android** y la base seleccionada es **Flutter** para móvil, **NestJS con TypeScript** para backend y **PostgreSQL con Prisma** para persistencia/acceso a datos. Se conserva la comparación con Ionic como antecedente, no como alternativa activa salvo nueva evidencia o instrucción. Esta decisión confirma plataforma y tecnologías, no versiones productivas ni validación técnica completa. La documentación oficial ofrece patrones de datos locales/remotos y canales hacia código de plataforma; no demuestra por sí sola rendimiento, costo o seguridad.
 
 Si el equipo ya domina Angular/TypeScript y puede mantener adaptadores Kotlin/Swift, **Ionic + Angular + Capacitor** es una alternativa igualmente viable que puede reducir aprendizaje. No se conoce la experiencia del equipo ni se han medido tiempos. El portal web independiente no obliga a compartir framework con móvil.
 
-La preferencia de stack registrada en Notion es Flutter, NestJS + TypeScript y PostgreSQL + Prisma. No se aprobaron versiones, dependencias productivas, backend ni base de datos; esta PoC no los valida.
+El usuario confirmó esta base tecnológica y Android. Las versiones concretas, compatibilidad integral, dependencias productivas y validación técnica/productiva permanecen pendientes; la evidencia T-005 no valida por sí sola despliegue ni operación productiva.
 
 ## Comparación basada en requisitos
 
@@ -19,7 +19,7 @@ La preferencia de stack registrada en Notion es Flutter, NestJS + TypeScript y P
 | Captura Android: RF-027/RF-028 | Canales de plataforma conectan Dart con código Android/iOS [F2]. | Plugins Android integran SDKs desde Java/Kotlin [C1]. | Ambos pueden envolver el mismo servicio nativo; ninguno garantiza acceso a contenido bancario. |
 | Segundo plano: RNF-018/RNF-020 | Procesos en segundo plano mediante isolates y mecanismos de plataforma [F3]. | Background Runner documenta límites del sistema y frecuencia no garantizada [C2]. | Sincronizar al abrir/reanudar y recuperar conectividad; no prometer captura ni sincronización continua. |
 | Datos sensibles: RNF-002/RNF-006 | Elegir almacenamiento protegido y validar plugins. | Igual requisito; no asumir que preferencias o almacenamiento web basten para datos financieros. | Exigir PoC de persistencia, cierre de sesión y aislamiento entre usuarios. |
-| Equipo y portal | Añade Dart si el equipo no lo conoce; el portal mantiene decisión propia. | Posible reutilización de conocimientos TypeScript/Angular si existen. | Preferencia Flutter anotada en Notion; experiencia del equipo y coste de mantenimiento siguen sin medirse. |
+| Equipo y portal | Añade Dart si el equipo no lo conoce; el portal mantiene decisión propia. | Posible reutilización de conocimientos TypeScript/Angular si existen. | Base Flutter confirmada; experiencia del equipo y coste de mantenimiento siguen sin medirse. |
 | Android/iOS: RNF-057/RNF-061 | Sujeto a permisos y APIs nativas. | Sujeto a los mismos permisos y APIs nativas. | El framework no elimina diferencias de capacidad entre plataformas. |
 
 [F1] [Flutter: Offline-first support](https://docs.flutter.dev/app-architecture/design-patterns/offline-first).
@@ -71,7 +71,7 @@ Usar datos sintéticos y un Android físico y un iPhone físico; registrar versi
 | Seguridad | Tokens y caché protegidos, cambio de usuario aislado, permiso revocado rechazado al sincronizar. | Pruebas negativas de CA-I1-07/11 y CA-I2-06. |
 | Paridad útil iOS | Registro manual, persistencia y reanudación funcionan aun sin captura de alertas externas. | Evidencia en iPhone físico; no simular equivalencia de conectores. |
 
-Comenzar con Flutter si no hay preferencia técnica informada; contrastar Ionic si hay experiencia web existente o la PoC revela coste excesivo. Elegir según requisitos críticos superados y coste real de mantener almacenamiento/conectores, no por una puntuación inventada. Si ningún candidato cumple, revisar la arquitectura o el alcance antes de aprobar DEC-004.
+Continuar T-005 sobre la base Flutter/NestJS-TypeScript/PostgreSQL-Prisma y plataforma Android confirmadas. Contrastar resultados con requisitos críticos y costo real de almacenamiento/conectores, no con una puntuación inventada. Si la validación encuentra bloqueos, documentar evidencia y proponer ajuste antes de fijar versiones productivas.
 
 ## Resultado parcial de T-005 — ejecución Windows
 
@@ -107,5 +107,5 @@ siguen pendientes. El stack productivo, versiones, DEC-004 y MVP no se aprueban.
 
 Cobertura parcial: RF-016/018, CA-I1-02 y RNF-020 a RNF-025 como flujo sintético; no sustituye criterio de rendimiento o disponibilidad productiva. Permanecen pendientes reinicio del proceso app, prueba física Android/iOS, captura por plataforma, permisos, privacidad por usuario, auth/cifrado, segundo plano, energía, rendimiento, transferencias/acuerdos compartidos. No usar datos reales.
 
-**Recomendación:** continuar con Flutter + NestJS/TypeScript + PostgreSQL/Prisma para completar T-005: ya se compilaron Flutter Windows y Nest, se ejercitó persistencia real y se verificó offline/replay en una integración GUI. La evidencia no valida Android/iOS, conectores, seguridad ni coste de equipo, por lo que no aprueba DEC-004, versiones productivas o MVP. Esas decisiones siguen pendientes.
+**Recomendación actualizada:** la base Flutter + NestJS/TypeScript + PostgreSQL/Prisma y Android primera versión están confirmados por el usuario. Continuar T-005 para validar técnicamente esa base; ya se compilaron Flutter Windows y Nest, se ejercitó persistencia real y se verificó offline/replay en integración GUI. La evidencia no valida Android físico, conectores, seguridad ni costo del equipo. Las versiones productivas y la aprobación formal del MVP siguen pendientes.
 

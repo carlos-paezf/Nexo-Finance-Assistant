@@ -1,15 +1,18 @@
 # Nexo — Índice del contexto para Codex
 
 Paquete v1.1. Copia de documentación consultada el 2026-10-02 en America/Bogota.
-Línea base v0.2: **163 RF + 75 RNF = 238 requisitos**.
-Etapa: levantamiento y especificación inicial. No hay MVP o tecnologías aprobadas.
+Línea base histórica v0.2: **163 RF + 75 RNF = 238 requisitos**. Catálogo vigente:
+**165 RF + 75 RNF = 240 requisitos** (RF-164/165 añadidos sin cambiar IDs de base).
+El usuario confirmó Android primera versión, Flutter/NestJS-TypeScript/PostgreSQL-Prisma,
+y el núcleo de MVP personal + grupos PAREJA/FAMILIA con migración bilateral.
+Versiones, validación técnica y aprobación formal del MVP siguen pendientes.
 
 [Proyecto en Notion](https://app.notion.com/p/3eeaf67c2e928135b4c6dd1d41f06290)
 
 ## Documentos
 | Archivo | Contenido | Fuente |
 | --- | --- | --- |
-| [01-requisitos-funcionales.md](01-requisitos-funcionales.md) | 01 — Requisitos funcionales (163) | [Notion](https://app.notion.com/p/3eeaf67c2e92814ba10ac103f880c628?pvs=204) |
+| [01-requisitos-funcionales.md](01-requisitos-funcionales.md) | 01 — Requisitos funcionales (165; v0.2 histórico: 163) | [Notion](https://app.notion.com/p/3eeaf67c2e92814ba10ac103f880c628?pvs=204) |
 | [02-requisitos-no-funcionales.md](02-requisitos-no-funcionales.md) | 02 — Requisitos no funcionales (75) | [Notion](https://app.notion.com/p/3eeaf67c2e9281ca8195c8068aa11e0d?pvs=204) |
 | [03-arquitectura-y-decisiones.md](03-arquitectura-y-decisiones.md) | 03 — Arquitectura y decisiones | [Notion](https://app.notion.com/p/3eeaf67c2e92810da2ceeb9eddf4c898?pvs=204) |
 | [04-reglas-de-negocio.md](04-reglas-de-negocio.md) | 04 — Reglas de negocio y privacidad | [Notion](https://app.notion.com/p/3eeaf67c2e92815b9783dcec6bee4ade?pvs=204) |
@@ -22,9 +25,11 @@ Etapa: levantamiento y especificación inicial. No hay MVP o tecnologías aproba
 
 ## Estado para arrancar
 - Confirmados: aprendizaje de recomendaciones, explorador de ahorro/inversión y
-  necesidad de administración y soporte.
-- Propuestas: tecnologías, prioridades y alcance del MVP.
-- Pendientes: depurar RF-007/RF-139, resolver la prioridad del cierre de tickets
+  necesidad de administración y soporte; Android y stack base; núcleo MVP personal
+  y grupos PAREJA/FAMILIA con migración en ambos sentidos.
+- Propuestas: reglas de transición, autorización, cardinalidad familiar y detalles
+  de alcance; prioridades de catálogo no alteradas por estas decisiones.
+- Pendientes: depurar RF-007/RF-139 sin perder la línea base, resolver la prioridad del cierre de tickets
   RF-152 y completar métricas no funcionales.
 - Primer trabajo sugerido: T-001 y T-002, propuesta de alcance y depuración del catálogo.
 - La sesión actual tiene Ponytail, Impeccable y UI UX Pro Max. Esta última está instalada globalmente en el perfil; no se duplicó en el proyecto.

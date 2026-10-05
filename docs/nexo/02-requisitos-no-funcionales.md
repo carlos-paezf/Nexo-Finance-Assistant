@@ -110,7 +110,7 @@
 | --- | --- |
 | RNF-050 | Separar presentación, negocio, persistencia e integraciones. |
 | RNF-051 | Conectores SMS, correo, notificaciones, OCR y entidades desacoplados. |
-| RNF-052 | Modelo admite múltiples integrantes, habilitando inicialmente dos. |
+| RNF-052 | El modelo admite grupos PAREJA y FAMILIA. PAREJA se limita a dos integrantes; FAMILIA admite múltiples integrantes. La cardinalidad familiar restante debe definirse antes del piloto, sin asumir un máximo. |
 | RNF-053 | Pruebas unitarias e integración de componentes críticos. |
 | RNF-054 | Migraciones versionadas. |
 | RNF-055 | Observabilidad y diagnóstico sin datos sensibles. |

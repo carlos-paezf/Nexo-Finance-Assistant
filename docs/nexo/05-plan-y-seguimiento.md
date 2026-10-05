@@ -12,7 +12,7 @@ Documentación inicial completada. Especificación detallada e implementación p
 - [ ] T-002 — Depurar solapamientos RF-007/RF-139 y resolver prioridad del cierre básico de tickets RF-152. Conservar trazabilidad.
 - [ ] T-003 — Redactar historias y criterios de aceptación de usuarios, movimientos y privacidad.
 - [ ] T-004 — Especificar distribución, redondeo, compensaciones y conservación de históricos con ejemplos verificables.
-- [ ] T-005 — Validar Flutter conforme a la preferencia tecnológica del usuario, con API de referencia NestJS/TypeScript y PostgreSQL/Prisma; después probar capacidades de captura por plataforma. PoC parcial; no selecciona stack productivo.
+- [ ] T-005 — Validar en Android la base confirmada por el usuario (Flutter, NestJS/TypeScript, PostgreSQL/Prisma); completar captura y demás experimentos. PoC parcial; versiones y validación productiva pendientes.
 - [ ] T-006 — Diseñar modelo de datos, permisos y sincronización offline.
 - [ ] T-007 — Diseñar flujos y pantallas de app y portal administrativo.
 - [ ] T-008 — Definir métricas de calidad, carga de referencia, recuperación y política de retención.
@@ -20,11 +20,11 @@ Documentación inicial completada. Especificación detallada e implementación p
 - [ ] T-010 — Crear estrategia de pruebas de motor financiero, privacidad, deduplicación y soporte.
 ## Secuencia propuesta
 1. Cerrar alcance, reglas y permisos.
-2. Construir núcleo: usuarios, cuentas, movimientos, finanzas compartidas, presupuestos y metas.
+2. Construir núcleo: usuarios, cuentas, movimientos personales, grupos PAREJA/FAMILIA y migración bilateral, finanzas compartidas y presupuestos; metas según alcance aprobado.
 3. Habilitar soporte básico, auditoría y observabilidad junto con el núcleo.
 4. Incorporar captura, hábitos, aprendizaje e IA según viabilidad.
 5. Incorporar comparación financiera y simulaciones con fuentes verificadas.
-6. Ampliar a grupos familiares.
+6. Precisar reglas familiares pendientes: cardinalidad FAMILIA, salida y acceso a históricos compartidos.
 La secuencia es una propuesta de planificación, no un compromiso de calendario.
 ## Plantilla de trazabilidad
 Por requisito: ID; módulo; prioridad; estado; historia de usuario; reglas; criterios de aceptación; dependencias; pruebas; versión; responsable; enlaces de evidencia.
@@ -245,5 +245,31 @@ $env:NEXO_DATA_DIRECTORY = 'D:\Nexus\poc\.runtime\privacy-use-b6cb9cb59e624046b3
 & 'D:\Nexus\poc\flutter_offline\build\windows\x64\runner\Release\nexo_offline_poc.exe'
 ```
 
-T-005 continúa en progreso. Stack definitivo, MVP, voz Narrator, lectores
-móviles y requisitos productivos siguen pendientes.
+T-005 continúa en progreso. La plataforma Android y la base tecnológica están
+confirmadas; versiones, validación productiva y aprobación formal del MVP,
+voz Narrator y lectores móviles siguen pendientes.
+
+## Seguimiento T-005 — decisiones de producto y migración de grupos — 5 de octubre de 2026
+
+El usuario confirmó Android primera versión, Flutter/NestJS-TypeScript/
+PostgreSQL-Prisma como base y MVP con finanzas personales y grupos PAREJA/FAMILIA
+desde el inicio, con migración bilateral. Versiones concretas, validación técnica
+y aprobación formal del MVP siguen pendientes. T-005 continúa en progreso.
+
+Se actualizó catálogo vigente a 165 RF + 75 RNF (240); se conserva línea base
+histórica v0.2 de 163 RF + 75 RNF (238), con RF-164/165 nuevos y prioridades
+propuestas. RNF-052 refleja PAREJA/FAMILIA, sin fijar el máximo familiar. Matriz
+MVP: 55 RF completos, 2 parciales, 108 diferidos; adelanta RF-139/142 y añade
+RF-164/165 sin cambiar prioridades originales. RF-140/141/143/144 permanecen
+diferidos; RF-007 sigue pendiente de depuración.
+
+Arquitectura y CA-I2-11 a CA-I2-17 contienen modelo único, autorización por
+recurso, conservación histórica, resolución explícita al convertir FAMILIA con
+miembros sobrantes, concurrencia optimista, idempotencia y replay offline. Una
+revisión independiente documental comprobó permisos y riesgo de pérdida; no es
+revisión de código. Cardinalidad familiar restante, acceso histórico de miembros
+salientes, retención, exportación/eliminación y detalles de reglas siguen como
+propuestas o pendientes. No se ejecutaron pruebas de producto por ser una
+actualización de especificación. Notion se sincronizó en las páginas enlazadas de
+RF/RNF, arquitectura, MVP, aceptación I1/I2, evaluación, plan y bitácora; lectura
+de regreso confirmó contenido completo, sin truncamiento ni bloques desconocidos.
