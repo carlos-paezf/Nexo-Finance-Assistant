@@ -233,3 +233,31 @@ $env:NEXO_DATA_DIRECTORY = 'D:\Nexus\poc\.runtime\privacy-use-b6cb9cb59e624046b3
 T-005 permanece abierta. La pantalla no representa conformidad ni aprobación
 productiva; faltan los experimentos móviles y la revisión legal/accesibilidad
 integral.
+
+## 5 de octubre de 2026 — pruebas C-12: teclado, contraste y objetivos táctiles
+
+La limpieza del test de lectura al 200% libera `SemanticsHandle` en `finally`;
+la liberación sigue ocurriendo antes de navegar al visor de licencias. El test
+de teclado inicia en `NexoPocApp`, usa eventos Tab, Shift+Tab, Enter y Espacio,
+comprueba apertura, expansión/contracción, foco visible, licencias y retorno.
+El test conserva los resets del viewport.
+
+Con el tema Material 3 y la paleta Nexo, el viewport 360×800 y escalas 100%/200%,
+pasaron `textContrastGuideline`, `labeledTapTargetGuideline`,
+`androidTapTargetGuideline` e `iOSTapTargetGuideline` para contenido expandido
+fuera de la vista inicial y el botón de licencias. Verificación final en
+`D:\Nexus\poc\flutter_offline`: `flutter analyze` sin issues; `flutter test`
+14/14; `git diff --check` sin errores. Pruebas widget automatizadas, no pruebas
+en dispositivos Android/iOS ni certificación WCAG. La UI no cambió; se mantienen
+la instancia Windows y sus datos sintéticos ya abiertos.
+
+Comando de arranque visual documentado:
+
+```powershell
+$env:NEXO_DATA_DIRECTORY = 'D:\Nexus\poc\.runtime\privacy-use-b6cb9cb59e624046b3789d99f3b9a71d'
+& 'D:\Nexus\poc\flutter_offline\build\windows\x64\runner\Release\nexo_offline_poc.exe'
+```
+
+T-005 continúa en progreso hasta completar los experimentos móviles, revisión
+con lectores de pantalla y controles de producción. El MVP y la conformidad
+productiva siguen pendientes.

@@ -264,12 +264,12 @@ y controles con nombres accesibles; no introduce estados dependientes del color.
 
 | Comprobación | Criterio de aceptación | Evidencia actual |
 | --- | --- | --- |
-| Lectura sin cuenta/red | Abrir información incluso ante fallo del almacenamiento | Test widget escrito; ejecución pendiente |
-| Texto ampliado | 200% en ancho 360 px; texto/control completo y desplazable | Test widget escrito; ejecución pendiente |
-| Controles nombrados | Etiquetas, estado expandido y visor de licencias accesibles | Material/tooltip; guideline escrita, sin ejecutar |
-| Contraste | Texto normal 4,5:1; grande/UI relevantes 3:1 según criterio | Medir paleta renderizada; pendiente |
-| Teclado | Tab/Shift+Tab, foco visible/no oculto, Enter/Espacio, volver sin atrapamiento | Prueba manual pendiente |
-| Puntero/táctil | Mínimo WCAG aplicable; verificar guía nativa de 48 dp Android/44 pt iOS | Pendiente en plataforma real |
+| Lectura sin cuenta/red | Abrir información incluso ante fallo del almacenamiento | Test widget ejecutado; pasa con fallo simulado de almacenamiento |
+| Texto ampliado | 200% en ancho 360 px; texto/control completo y desplazable | Test widget ejecutado; llega al apartado de accesibilidad y al visor de licencias |
+| Controles nombrados | Etiquetas, estado expandido y visor de licencias accesibles | Guías del SDK ejecutadas al 100%/200%; pasan en contenido y licencia |
+| Contraste | Texto normal 4,5:1; grande/UI relevantes 3:1 según criterio | `textContrastGuideline` pasa en los árboles comprobados al 100%/200% |
+| Teclado | Tab/Shift+Tab, foco visible/no oculto, Enter/Espacio, volver sin atrapamiento | Test widget desde `NexoPocApp`; abre, expande/contrae, consulta licencias y vuelve |
+| Puntero/táctil | Mínimo WCAG aplicable; verificar guía nativa de 48 dp Android/44 pt iOS | `labeledTapTargetGuideline`, Android e iOS pasan en el alcance automatizado; sin dispositivo físico |
 | Lectores | Orden/nombre/rol/estado con Narrator, TalkBack y VoiceOver | No ejecutados |
 | Flujos financieros | Errores claros, saldo/estado textual, contraste y foco sin perder contexto | Auditar app completa en la iteración local |
 
@@ -282,9 +282,18 @@ La pantalla **Privacidad y uso** se abre desde el icono de privacidad de la
 barra superior; funciona con textos locales y permite consultar las licencias.
 No registra aceptación ni cambia cuentas, cola, API o base de datos.
 
-Este entorno Linux no tiene Flutter/Dart. Las pruebas widget nuevas están
-escritas **sin ejecutar**; no se repiten como evidencia los 5/5 anteriores.
-Validación local de Windows pendiente con el SDK ya instalado del usuario:
+Validación automatizada realizada en Windows con Flutter local. `flutter analyze`
+no reportó issues y `flutter test` pasó 14/14. Los tests de teclado y guías se
+ejecutaron por separado durante su iteración. El viewport de guía es 360×800 a
+escalas 100% y 200%; el test de
+teclado recorre controles enfocados y su centro permanece visible (la caja del
+botón de licencias admite hasta 4 px de desborde inferior en el viewport de
+test). Esto es evidencia de Flutter Test, no prueba nativa Android/iOS ni una
+medición/certificación integral WCAG.
+
+La instancia visual Windows ya abierta permanece disponible y no se relanzó:
+esta iteración solo modifica pruebas. Comando para iniciar una nueva instancia
+con datos sintéticos aislados:
 
 ```powershell
 Set-Location D:\Nexus\poc\flutter_offline
@@ -293,9 +302,10 @@ Set-Location D:\Nexus\poc\flutter_offline
 & 'D:\Nexus\poc\.runtime\flutter\bin\flutter.bat' run -d windows --dart-define=NEXO_API_URL=http://127.0.0.1:3000
 ```
 
-Revisar los doce apartados con/sin cuenta, API apagada, teclado, zoom del sistema
-y Narrator. La ejecución visual Flutter no se acredita desde esta sesión.
-T-005 sigue en progreso. Consumo de tokens atribuible: N/D.
+Quedan pendientes la evaluación completa de todos los flujos, Narrator/TalkBack/
+VoiceOver, pruebas en dispositivos Android/iOS, mediciones nativas de objetivos
+táctiles y auditoría de conformidad. T-005 sigue en progreso; no se declara
+cumplimiento productivo. Consumo de tokens atribuible: N/D.
 
 Código y documentos: commit [`d8126d9`](https://github.com/carlos-paezf/Nexo-Finance-Assistant/commit/d8126d9b2a56281a03dfecc017c28e0f048c7562)
 — `feat(poc): add privacy and usage information`, [PR #2 en borrador](https://github.com/carlos-paezf/Nexo-Finance-Assistant/pull/2),

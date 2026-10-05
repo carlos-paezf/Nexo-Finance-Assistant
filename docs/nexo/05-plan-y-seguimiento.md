@@ -148,3 +148,31 @@ $env:NEXO_DATA_DIRECTORY = 'D:\Nexus\poc\.runtime\privacy-use-b6cb9cb59e624046b3
 T-005 continúa en progreso. La pantalla es informativa, no captura aceptación;
 cumplimiento, documentos productivos, accesibilidad integral y validación móvil
 siguen pendientes.
+
+## Seguimiento T-005 — validación automatizada de C-12 — 5 de octubre de 2026
+
+Se reforzó el test de teclado desde `NexoPocApp`: Tab alcanza el control de
+privacidad y los apartados; Espacio expande/contrae; Enter abre Privacidad y uso,
+el visor de licencias y el retorno con Shift+Tab/Espacio. El test confirma que
+el control enfocado coincide con su objetivo y queda visible en el viewport.
+Se conserva el `SemanticsHandle` del test al 200% dentro de `try/finally` y se
+mantiene su liberación antes de abrir `LicensePage`.
+
+En viewport 360×800, las guías `textContrastGuideline`,
+`labeledTapTargetGuideline`, `androidTapTargetGuideline` e
+`iOSTapTargetGuideline` pasan para el apartado de accesibilidad expandido y el
+control de licencias, a escalas 100% y 200%. Evidencia automatizada Flutter
+Test; no equivale a auditoría WCAG integral ni a validación en dispositivos.
+Comprobaciones finales: `flutter analyze` sin issues y `flutter test` 14/14;
+tests específicos de teclado, lectura ampliada y guías también pasaron.
+`git diff --check` pasó. No cambió la UI ejecutable, así que se conserva la
+instancia Windows existente. Comando para abrir una nueva instancia sintética:
+
+```powershell
+$env:NEXO_DATA_DIRECTORY = 'D:\Nexus\poc\.runtime\privacy-use-b6cb9cb59e624046b3789d99f3b9a71d'
+& 'D:\Nexus\poc\flutter_offline\build\windows\x64\runner\Release\nexo_offline_poc.exe'
+```
+
+T-005 permanece en progreso. Narrator/TalkBack/VoiceOver, dispositivos móviles,
+objetivos táctiles nativos y accesibilidad integral quedan pendientes. No se
+declara conformidad ni aprobación productiva.
