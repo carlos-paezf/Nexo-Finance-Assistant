@@ -438,3 +438,35 @@ históricos compartidos. La prueba de permiso revocado es secuencial; no se hizo
 un intercalado controlado de revocación concurrente, aunque la lectura bloqueada
 de membresía la serializa frente al cambio. No se valida Android ni cumplimiento
 de T-005 completo.
+
+## 5 de octubre de 2026 — sesiones sintéticas y cambio de modo autenticado
+
+La migración aditiva `20261005010000_auth_http` creó `User` y `AuthSession`; no
+tocó `Account`, `Movement`, `Group` ni membresías anteriores. El registro genera
+UUID de servidor, normaliza correo y almacena contraseña como scrypt versionado
+con `N=131072`, `r=8`, `p=1`, salt de 16 bytes, hash de 64 bytes y máximo 192 MiB.
+Un único hash concurrente y 60 intentos/minuto por proceso limitan el runtime de
+laboratorio. La contraseña se valida en 12–128 puntos de código y hasta 256
+bytes UTF-8 sin transformarla. Sesiones de 8 horas guardan solo SHA-256 del
+token aleatorio; logout revoca en PostgreSQL. API ligada a `127.0.0.1`; errores
+de parser entregan 400/413 genéricos y `no-store` para `/auth`.
+
+`npm run db:deploy` aplicó la migración. `npm test` pasó 38/38, 0 fallos y 0
+omitidas: 8 subpruebas HTTP cubrieron registro/duplicado, credenciales genéricas,
+tokens ausente/inválido/caducado/revocado, logout, frontera de actor, modo
+autorizado/replay/conflicto/revocación, reinicio de API y errores de parser; las
+11 pruebas PostgreSQL de cambio de modo también pasaron. Se verificó la limpieza
+de fixtures: cero usuarios, sesiones, grupos o recibos del test. Revisión
+independiente Sol: sin defectos bloqueantes.
+
+La instancia financiera sigue abierta en Windows (PID 95952) con la API
+reiniciada como PID 77768, ligada solo a `127.0.0.1:3011`, ejecutable Release
+`poc/flutter_offline/build/windows/x64/runner/Release/nexo_offline_poc.exe` y
+datos sintéticos `D:\Nexus\poc\.runtime\t005-runtime-recovery-20261005-6f3a`.
+No incluye login/grupos; las rutas financieras existentes siguen sin autenticar.
+Desde `poc/api`, el arranque fue: `$line = Get-Content .env | Where-Object { $_ -match '^DATABASE_URL=' } | Select-Object -First 1; $env:DATABASE_URL = $line.Substring('DATABASE_URL='.Length); $env:PORT = '3011'; Start-Process -FilePath (Get-Command node).Source -ArgumentList 'dist/src/main.js' -WorkingDirectory (Get-Location).Path -WindowStyle Hidden`. La prueba local `GET http://127.0.0.1:3011/accounts/no-existe` respondió 404.
+
+RF-001, RF-002 y RF-008 reciben cobertura experimental parcial. No se valida
+recuperación/verificación de correo, Flutter ni Android, autenticación financiera
+integral, TLS ni despliegue. Los límites de intentos y hash son por proceso; las
+sesiones no tienen purga operacional. T-005 permanece en progreso.

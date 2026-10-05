@@ -40,6 +40,26 @@ enum GroupMode {
   FAMILIA
 }
 
+model User {
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String        @unique @db.VarChar(254)
+  passwordHash String        @db.VarChar(256)
+  createdAt    DateTime      @default(now()) @db.Timestamptz(3)
+  sessions     AuthSession[]
+}
+
+model AuthSession {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String    @db.Uuid
+  tokenHash String    @unique @db.Char(64)
+  expiresAt DateTime  @db.Timestamptz(3)
+  revokedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
 model Group {
   id          String               @id @db.Uuid
   type        GroupMode

@@ -350,3 +350,34 @@ iniciar la API persistente y la instancia visual. La secuencia está precisada e
 La cobertura no acredita autorización HTTP, invitaciones, sincronización offline
 de grupos ni conservación de históricos compartidos. T-005 y sus criterios
 completos siguen abiertos.
+
+## Seguimiento T-005 — identidad y cambio de modo por HTTP — 5 de octubre de 2026
+
+Se aplicó `20261005010000_auth_http` sin resetear PostgreSQL. La migración suma
+`User` y `AuthSession`; las membresías/UUID sintéticos previos permanecen sin
+adopción. Registro, login y logout usan scrypt asíncrono versionado, sesiones de
+8 horas con digest SHA-256, expiración/revocación persistentes y límites de
+laboratorio documentados en `poc/api/README.md`. El API escucha en loopback.
+`PATCH /groups/:groupId/mode` requiere Bearer, toma el actor de la sesión y
+reutiliza la autorización e idempotencia PostgreSQL anteriores. No se añadieron
+autenticación financiera ni interfaz de login/grupos.
+
+`npm test`: 38/38 pruebas, 0 fallos y 0 omitidas, con PostgreSQL real. Incluye
+8 subpruebas HTTP y 11 de persistencia de modo, reinicio API y limpieza de
+fixtures; la prueba distingue JSON malformado 400 del límite de cuerpo 413.
+Revisión independiente Sol: sin defectos bloqueantes. `git diff --check` pasó.
+
+La instancia financiera Windows permanece abierta (ventana PID 95952, API PID
+77768 ligada solo a `127.0.0.1:3011`, datos sintéticos en
+`D:\Nexus\poc\.runtime\t005-runtime-recovery-20261005-6f3a`). Se revisa con
+`& '.\build\windows\x64\runner\Release\nexo_offline_poc.exe'` desde
+`poc/flutter_offline`; la pantalla no presenta login ni grupos.
+
+API reiniciada desde `poc/api` después de la suite; comprobación HTTP local
+`GET http://127.0.0.1:3011/accounts/no-existe` respondió 404. Arranque exacto:
+`$line = Get-Content .env | Where-Object { $_ -match '^DATABASE_URL=' } | Select-Object -First 1; $env:DATABASE_URL = $line.Substring('DATABASE_URL='.Length); $env:PORT = '3011'; Start-Process -FilePath (Get-Command node).Source -ArgumentList 'dist/src/main.js' -WorkingDirectory (Get-Location).Path -WindowStyle Hidden`.
+
+Cobertura parcial de RF-001/RF-002/RF-008. Siguen pendientes recuperación y
+verificación de correo, recuperación de contraseña, TLS, límites compartidos
+entre procesos, expiración/purga operacional, autenticación de endpoints
+financieros, integración Flutter/Android y validación completa de T-005.

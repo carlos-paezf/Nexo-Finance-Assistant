@@ -37,7 +37,7 @@ La orden inicia el directorio existente; no inicializa ni sustituye el clúster.
 El archivo `.env` local de esta PoC apunta a la base sintética exclusiva y no se
 versiona. No imprimir ni copiar sus credenciales a logs.
 
-`npm test` compila y ejecuta pruebas de servicio más la integración HTTP/PostgreSQL. La integración se omite si falta `DATABASE_URL`; con base disponible levanta y reinicia un proceso NestJS, verifica reintentos, saldo y conflicto, y limpia la cuenta sintética. `npm run test:postgres` ejecuta solo esa integración. La conexión local del ejemplo solo es para desarrollo.
+`npm test` compila y ejecuta pruebas de servicio más integraciones HTTP/PostgreSQL. La suite de finanzas se omite si falta `DATABASE_URL`; la suite `auth-groups.http.spec` exige la base y falla si no está configurada. Con la base disponible, las integraciones levantan y reinician procesos NestJS y limpian solo sus fixtures sintéticos. `npm run test:postgres` ejecuta solo la integración financiera.
 
 ## Contrato
 
@@ -46,4 +46,13 @@ versiona. No imprimir ni copiar sus credenciales a logs.
 - `GET /accounts/:id`: detalle, movimientos y `balanceCents`.
 - Los IDs estables son las claves únicas. Payload repetido devuelve el registro original; misma clave con distinto contenido devuelve HTTP 409. Importes viajan como strings de centavos y se guardan como PostgreSQL `BIGINT`/`BigInt`.
 
-Este alcance no implementa usuarios, autorización, permisos por recurso, transferencias ni acuerdos compartidos. La integración probada fue en PostgreSQL local dedicado a la PoC; no usar datos reales.
+Los endpoints financieros existentes continúan sin autenticación. El nuevo flujo experimental añade registro/sesión y autoriza únicamente `PATCH /groups/:groupId/mode`; no habilita autenticación financiera integral, invitaciones, transferencias ni acuerdos compartidos. La integración probada fue en PostgreSQL local dedicado a la PoC; no usar datos reales.
+
+## Identidad y sesiones — laboratorio
+
+- `POST /auth/register`, `POST /auth/login` y `POST /auth/logout` escuchan solo en `127.0.0.1`; credenciales usan `Cache-Control: no-store`.
+- El PoC valida contraseña de 12–128 puntos de código y hasta 256 bytes UTF-8; conserva exactamente los caracteres recibidos. El correo se recorta y normaliza a minúsculas.
+- Hash asíncrono de laboratorio: `scrypt`, `N=131072`, `r=8`, `p=1`, memoria máxima por operación 192 MiB, salt aleatorio de 16 bytes y salida de 64 bytes. Formato versionado incluye algoritmo, parámetros, salt y hash; se compara con `timingSafeEqual`.
+- Solo se ejecuta un hash simultáneo y se limita a 60 intentos por minuto por proceso. No hay cola de hash; el límite se reinicia al reiniciar la API.
+- El token de sesión tiene 32 bytes aleatorios; PostgreSQL conserva únicamente SHA-256. La sesión vence a las 8 horas y el logout deja revocación persistente.
+- Es configuración experimental para datos sintéticos y loopback. No hay TLS, verificación de correo, recuperación de contraseña, purga de sesiones, límite distribuido ni adopción automática de UUID/membresías sintéticas existentes. No usar para producción.

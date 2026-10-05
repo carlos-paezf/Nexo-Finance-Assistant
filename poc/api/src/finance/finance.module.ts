@@ -13,5 +13,6 @@ import { PrismaFinanceStore } from './prisma-finance.store';
     { provide: FINANCE_STORE, useExisting: PrismaFinanceStore },
     FinanceService,
   ],
+  exports: [PrismaService],
 })
 export class FinanceModule {}

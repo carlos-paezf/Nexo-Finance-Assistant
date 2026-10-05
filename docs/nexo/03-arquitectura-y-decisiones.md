@@ -97,3 +97,23 @@ decisiones de producción siguen pendientes. La prueba cubre permiso revocado
 antes del replay, no un intercalado controlado de revocación durante una
 transición concurrente; el bloqueo compartido de la fila de membresía serializa
 esa escritura durante la operación.
+
+### Identidad y autorización HTTP experimental — 5 de octubre de 2026
+
+Una migración aditiva incorpora `User` y `AuthSession`; conserva las tablas y
+fixtures anteriores y no convierte automáticamente sus UUID en identidades.
+Registro usa UUID generado por PostgreSQL, correo normalizado único y hash
+versionado `scrypt` asíncrono (`N=131072`, `r=8`, `p=1`, salt de 16 bytes,
+salida de 64 bytes, máximo 192 MiB por operación). El proceso permite un hash
+concurrente y 60 intentos por minuto; ambos límites son locales al proceso.
+Tokens aleatorios de 32 bytes se almacenan únicamente como SHA-256; las sesiones
+persisten expiración de 8 horas y revocación.
+
+`npm test` pasó 38/38 sin omisiones contra PostgreSQL real. Ocho subpruebas HTTP
+cubren registro, colisión, credenciales, sesiones, logout, actor de grupo,
+rechazo de identidad falsificada, idempotencia y reinicio de API; las once
+subpruebas persistentes anteriores siguen pasando. Solo `PATCH
+/groups/:groupId/mode` exige Bearer y deriva el actor de la sesión. Los endpoints
+financieros continúan sin autenticar; no se demuestra autorización integral,
+verificación de correo, recuperación, TLS ni validación Flutter/Android. RF-001,
+RF-002 y RF-008 tienen cobertura experimental parcial; T-005 sigue abierto.
