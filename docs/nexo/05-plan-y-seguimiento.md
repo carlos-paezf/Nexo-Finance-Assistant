@@ -195,3 +195,34 @@ licencias. Procedimiento y comando Release con carpeta de datos sintéticos
 independiente están documentados en C-12. Como no cambió la UI de producción,
 no se recompiló ni relanzó Windows. T-005 sigue en progreso; no se declara
 validación de lector nativo, móvil ni conformidad productiva.
+
+### Actualización T-005 — recorrido completo y UIA — 5 de octubre de 2026
+
+Se reforzó C-12 para recorrer los cuerpos desde el inicio visible hasta el fin
+con desplazamientos solapados del 65% del área útil (intersección del viewport
+con `Scrollable`). Cada posición comprueba visibilidad y ejecuta las cuatro
+guías; el test falla si no avanza y limita cada cuerpo a 40 posiciones.
+Cabeceras y licencias deben estar contenidas completamente en el área. Los
+matchers del SDK validan nombre, tap e hints localizados para expansión y
+contracción, más aparición/desaparición del texto.
+
+Se abrió Release Windows con datos sintéticos aislados (PID PoC 44128) e inició
+Narrator (PID 81976). UIA expone 12/12 encabezados como `Button` con
+`InvokePattern` en orden; se verificó abrir `Licenses` y volver por `Back`.
+El rol estático observado inicialmente se corrigió con `Semantics(button: true)`
+y se reconstruyó Release. Limitación: UIA no expone el texto del cuerpo, hint
+ni estado expandido, y marca los botones no enfocables; tampoco hay captura de
+salida hablada. La validación manual de Narrator permanece pendiente; no se
+declara aprobación de accesibilidad ni validación móvil.
+
+Verificaciones finales después de las ediciones: `flutter analyze` sin issues;
+`flutter test` 14/14; `git diff --check` sin errores.
+Comando visual Release con `NEXO_DATA_DIRECTORY` independiente:
+
+```powershell
+$env:NEXO_DATA_DIRECTORY = 'D:\Nexus\poc\.runtime\privacy-use-b6cb9cb59e624046b3789d99f3b9a71d'
+& 'D:\Nexus\poc\flutter_offline\build\windows\x64\runner\Release\nexo_offline_poc.exe'
+```
+
+T-005 continúa en progreso. Stack definitivo, MVP, voz Narrator, lectores
+móviles y requisitos productivos siguen pendientes.

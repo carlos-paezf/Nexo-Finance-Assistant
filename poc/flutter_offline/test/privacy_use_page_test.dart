@@ -257,11 +257,74 @@ void main() {
         await tester.pumpAndSettle();
       }
 
+      Rect visibleScrollArea(Finder scrollable) {
+        final viewport = Offset.zero &
+            (tester.view.physicalSize / tester.view.devicePixelRatio);
+        return viewport.intersect(tester.getRect(scrollable));
+      }
+
+      Future<void> checkBody(Finder body, Finder scrollable) async {
+        final visibleArea = visibleScrollArea(scrollable);
+        final step = visibleArea.height * 0.65;
+        var previousTop = tester.getRect(body).top;
+        expect(
+          previousTop,
+          greaterThanOrEqualTo(visibleArea.top),
+          reason: 'El recorrido debe comenzar al inicio del cuerpo',
+        );
+        for (var position = 0; position < 40; position++) {
+          final bodyRect = tester.getRect(body);
+          expect(
+            bodyRect.overlaps(visibleArea),
+            isTrue,
+            reason: 'El cuerpo debe intersectar el área visible del scroll',
+          );
+          await checkGuidelines();
+          if (bodyRect.bottom <= visibleArea.bottom) return;
+
+          await tester.dragFrom(visibleArea.center, Offset(0, -step));
+          await tester.pumpAndSettle();
+          final nextTop = tester.getRect(body).top;
+          expect(
+            nextTop,
+            lessThan(previousTop - 1),
+            reason: 'El recorrido debe avanzar hasta el final del cuerpo',
+          );
+          previousTop = nextTop;
+        }
+        fail('El cuerpo no llegó a su final dentro del límite de 40 posiciones');
+      }
+
+      void expectSectionSemantics(
+        Finder title,
+        String name,
+        MaterialLocalizations localizations, {
+        required bool expanded,
+      }) {
+        expect(
+          tester.getSemantics(title),
+          matchesSemantics(
+            label: name,
+            isButton: true,
+            hasTapAction: true,
+            hasFocusAction: true,
+            hasEnabledState: true,
+            isEnabled: true,
+            isFocusable: true,
+            hasSelectedState: true,
+            hint: expanded
+                ? localizations.collapsedHint
+                : localizations.expandedHint,
+            onTapHint: expanded
+                ? localizations.expansionTileExpandedTapHint
+                : localizations.expansionTileCollapsedTapHint,
+          ),
+        );
+      }
+
       for (final scale in [1.0, 2.0]) {
         var scrollable = await pumpPage(scale, 'initial');
         await checkGuidelines();
-        final viewport = Offset.zero &
-            (tester.view.physicalSize / tester.view.devicePixelRatio);
         for (var index = 0; index < privacyUseSections.length; index++) {
           final section = privacyUseSections[index];
           scrollable = await pumpPage(scale, 'section-$index');
@@ -275,39 +338,71 @@ void main() {
             matching: find.byType(ListTile),
           );
           await reveal(header, scrollable);
-          expect(
-            tester.getRect(header).overlaps(tester.getRect(scrollable)),
-            isTrue,
+          final visibleArea = visibleScrollArea(scrollable);
+          final headerRect = tester.getRect(header);
+          expect(visibleArea.contains(headerRect.topLeft), isTrue);
+          expect(visibleArea.contains(headerRect.bottomRight), isTrue);
+          final localizations = MaterialLocalizations.of(tester.element(title));
+          expectSectionSemantics(
+            title,
+            section.$1,
+            localizations,
+            expanded: false,
           );
-          expect(tester.getRect(header).overlaps(viewport), isTrue);
-          final collapsedHint =
-              tester.getSemantics(title).getSemanticsData().hint;
           tester.binding.renderViews.first.owner!.semanticsOwner!.performAction(
             tester.getSemantics(title).id,
             ui.SemanticsAction.tap,
           );
           await tester.pumpAndSettle();
-          expect(
-            tester.getSemantics(title).getSemanticsData().hint,
-            isNot(collapsedHint),
+          expectSectionSemantics(
+            title,
+            section.$1,
+            localizations,
+            expanded: true,
           );
           final content = find.text(section.$2);
           expect(content, findsOneWidget);
           expect(find.byType(SelectableText), findsOneWidget);
-          await Scrollable.ensureVisible(
-            tester.element(content),
-            alignment: 0.25,
+          tester.binding.renderViews.first.owner!.semanticsOwner!.performAction(
+            tester.getSemantics(title).id,
+            ui.SemanticsAction.tap,
           );
           await tester.pumpAndSettle();
-          expect(tester.getRect(content).overlaps(viewport), isTrue);
-          await checkGuidelines();
+          expectSectionSemantics(
+            title,
+            section.$1,
+            localizations,
+            expanded: false,
+          );
+          expect(find.text(section.$2), findsNothing);
+
+          tester.binding.renderViews.first.owner!.semanticsOwner!.performAction(
+            tester.getSemantics(title).id,
+            ui.SemanticsAction.tap,
+          );
+          await tester.pumpAndSettle();
+          expectSectionSemantics(
+            title,
+            section.$1,
+            localizations,
+            expanded: true,
+          );
+          await Scrollable.ensureVisible(
+            tester.element(content),
+            alignment: 0,
+          );
+          await tester.pumpAndSettle();
+          await checkBody(content, scrollable);
           expect(tester.takeException(), isNull);
         }
 
         scrollable = await pumpPage(scale, 'licenses');
         final licenses = find.text('Licencias de componentes');
         await reveal(licenses, scrollable);
-        expect(tester.getRect(licenses).overlaps(viewport), isTrue);
+        final visibleArea = visibleScrollArea(scrollable);
+        final licenseRect = tester.getRect(licenses);
+        expect(visibleArea.contains(licenseRect.topLeft), isTrue);
+        expect(visibleArea.contains(licenseRect.bottomRight), isTrue);
         await checkGuidelines();
         expect(tester.takeException(), isNull);
       }

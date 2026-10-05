@@ -284,3 +284,26 @@ abrir licencias con Enter y volver comprobando el anuncio de retorno. Sin
 cambio de UI de producción, no fue necesario recompilar ni relanzar Windows.
 T-005 continúa en progreso; validación nativa, móvil y aprobación productiva
 siguen pendientes.
+
+## 5 de octubre de 2026 — recorrido completo y UIA de Narrator
+
+El test recorre los 12 cuerpos a 100%/200% y ancho 360 del comienzo visible
+al final, con pasos solapados del 65% de la intersección viewport/Scrollable.
+Cada posición ejecuta las cuatro guías y exige que el scroll avance, con tope
+de 40 posiciones por cuerpo. Comprueba contención completa de encabezados y
+licencias. `matchesSemantics` con `MaterialLocalizations` comprueba el nombre,
+acción tap e hints para expandido/contraído, y el cuerpo presente/ausente.
+
+Se abrió Release Windows en el directorio sintético aislado (PID 44128) y se
+activó Narrator (PID 81976). UIA expone los 12 encabezados como Button con
+InvokePattern y conserva el orden; también se verificó abrir Licenses y volver
+con Back. Se corrigió el rol inicialmente estático añadiendo
+`Semantics(button: true)` y se recompiló. UIA no expone el cuerpo expandido,
+HelpText o patrón de expansión y marca los botones no enfocables; no se pudo
+escuchar ni capturar la voz. Por eso la validación humana de anuncios y foco
+sigue pendiente. Captura de la ventana expandida, local/no versionada:
+`poc/.runtime/t005-narrator-expanded.png`.
+
+Verificaciones finales después de documentar: `flutter analyze` sin issues,
+`flutter test` 14/14 y `git diff --check` sin errores. T-005 permanece en
+progreso; no se declara conformidad, aprobación productiva ni validación móvil.

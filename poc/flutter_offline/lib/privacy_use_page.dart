@@ -139,7 +139,10 @@ class PrivacyUsePage extends StatelessWidget {
                       tilePadding: EdgeInsets.zero,
                       childrenPadding: const EdgeInsets.only(bottom: 20),
                       expandedAlignment: Alignment.centerLeft,
-                      title: Text(section.$1),
+                      title: Semantics(
+                        button: true,
+                        child: Text(section.$1),
+                      ),
                       children: [SelectableText(section.$2)],
                     ),
                   const SizedBox(height: 20),

@@ -270,7 +270,7 @@ y controles con nombres accesibles; no introduce estados dependientes del color.
 | Contraste | Texto normal 4,5:1; grande/UI relevantes 3:1 según criterio | `textContrastGuideline` pasa en los árboles comprobados al 100%/200% |
 | Teclado | Tab/Shift+Tab, foco visible/no oculto, Enter/Espacio, volver sin atrapamiento | Test widget desde `NexoPocApp`; abre, expande/contrae, consulta licencias y vuelve |
 | Puntero/táctil | Mínimo WCAG aplicable; verificar guía nativa de 48 dp Android/44 pt iOS | `labeledTapTargetGuideline`, Android e iOS pasan en el alcance automatizado; sin dispositivo físico |
-| Lectores | Orden/nombre/rol/estado con Narrator, TalkBack y VoiceOver | No ejecutados |
+| Lectores | Orden/nombre/rol/estado con Narrator, TalkBack y VoiceOver | Windows UIA parcial: Narrator activo; 12 nombres/roles Button e InvokePattern en orden; licencia y retorno verificados. Audio no capturado; UIA no expone cuerpo ni estado expandido. Narrator completo y lectores móviles pendientes. |
 | Flujos financieros | Errores claros, saldo/estado textual, contraste y foco sin perder contexto | Auditar app completa en la iteración local |
 
 Fuentes: [WCAG 2.2](https://www.w3.org/TR/WCAG22/) y
@@ -365,3 +365,24 @@ $env:NEXO_DATA_DIRECTORY = 'D:\Nexus\poc\.runtime\privacy-use-b6cb9cb59e624046b3
 Esta evidencia cubre escritorio y pruebas widget; no valida Android ni iOS
 físicos, accesibilidad de toda la app ni conformidad legal. T-005 y el
 cumplimiento productivo continúan pendientes.
+
+### Actualización C-12 — UI Automation con Narrator activo — 5 de octubre de 2026
+
+Se abrió Release Windows con el directorio de datos sintéticos independiente
+documentado arriba (PID PoC 44128); Narrator quedó activo (PID 81976). UIA
+encontró los 12 nombres de sección en el orden de `privacyUseSections`. La
+inspección inicial presentaba los encabezados como texto estático; se añadió
+`Semantics(button: true)` al título del `ExpansionTile` y se reconstruyó
+Release. UIA posterior muestra los 12 como `ControlType.Button` con
+`InvokePattern`. Al invocar la primera sección se comprobó visualmente el
+cuerpo; se verificó la vuelta desde la vista `Licenses` mediante el botón
+`Back`.
+
+Límite observado: los nodos de botón aparecen no enfocables para UIA y sin
+`HelpText` ni patrón `ExpandCollapse`; UIA tampoco expone el texto del cuerpo
+expandido. Flutter Test sí verifica los hints localizados y estados expandido/
+contraído y cuerpo visible/oculto. Las herramientas de esta sesión no permiten
+escuchar ni capturar la voz de Narrator, por lo que quedan pendientes anuncios,
+foco y navegación de lector validados por una persona. TalkBack/VoiceOver y
+validación móvil también quedan pendientes. Captura Windows expandida
+(local, no versionada): `poc/.runtime/t005-narrator-expanded.png`.
