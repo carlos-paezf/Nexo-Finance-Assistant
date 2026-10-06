@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MovementType {
+  INCOME
+  EXPENSE
+}
+
+model Account {
+  id            String     @id @db.VarChar(80)
+  name          String     @db.VarChar(80)
+  openingCents  BigInt
+  requestHash   String     @db.Char(64)
+  createdAt     DateTime   @default(now()) @db.Timestamptz(3)
+  movements     Movement[]
+}
+
+model Movement {
+  id           String       @id @db.VarChar(80)
+  accountId    String       @db.VarChar(80)
+  account      Account      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  type         MovementType
+  description  String       @db.VarChar(200)
+  amountCents  BigInt
+  occurredAt   DateTime     @db.Timestamptz(3)
+  requestHash  String       @db.Char(64)
+  createdAt    DateTime     @default(now()) @db.Timestamptz(3)
+
+  @@index([accountId, occurredAt])
+}
+
+enum GroupMode {
+  PAREJA
+  FAMILIA
+}
+
+model User {
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String        @unique @db.VarChar(254)
+  passwordHash String        @db.VarChar(256)
+  createdAt    DateTime      @default(now()) @db.Timestamptz(3)
+  sessions     AuthSession[]
+}
+
+model AuthSession {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String    @db.Uuid
+  tokenHash String    @unique @db.Char(64)
+  expiresAt DateTime  @db.Timestamptz(3)
+  revokedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Group {
+  id          String               @id @db.Uuid
+  name        String               @default("Grupo existente") @db.VarChar(80)
+  type        GroupMode
+  revision    BigInt               @default(0)
+  memberships GroupMembership[]
+  operations  GroupModeOperation[]
+}
+
+model GroupMembership {
+  groupId       String  @db.Uuid
+  userId        String  @db.Uuid
+  active        Boolean @default(true)
+  canChangeMode Boolean @default(false)
+  group         Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([groupId, userId])
+}
+
+model GroupModeOperation {
+  groupId      String   @db.Uuid
+  actorId      String   @db.Uuid
+  operationKey String   @db.VarChar(80)
+  requestHash  String   @db.Char(64)
+  result       Json
+  group        Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([groupId, actorId, operationKey])
+}

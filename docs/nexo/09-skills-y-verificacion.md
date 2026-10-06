@@ -17,7 +17,10 @@ En tu instalación, habilita los plugins correspondientes o sus skills y
 comprueba que Codex los enumera. No se copian sus binarios ni paquetes en este ZIP.
 
 UI UX Pro Max no apareció como coincidencia exacta del catálogo de plugins
-consultado. Su autor documenta compatibilidad y un instalador para Codex.
+consultado. El 3 de octubre se encontró instalada globalmente en
+`C:\Users\cpaez\.agents\skills\ui-ux-pro-max`, con SKILL.md, datos y scripts; además
+aparece entre las skills disponibles en esta sesión. No está copiada en el
+proyecto, pero no falta ni se repitió el instalador.
 
 Desde la raíz del proyecto, con Node/npm y Python disponibles:
 
@@ -25,9 +28,11 @@ Desde la raíz del proyecto, con Node/npm y Python disponibles:
 npx --yes ui-ux-pro-max-cli init --ai codex
 ```
 
-Comprueba primero si ya existe. Registra la versión instalada y preserva cambios
-locales; el comando no se ejecutó en el repositorio del usuario. El instalador
-es herramienta de desarrollo, no dependencia de producción de Nexo.
+Solo si falta en el perfil y en el proyecto, comprueba primero si existe una
+instalación personalizada y usa el instalador por proyecto. Para esta sesión no
+hizo falta ejecutar el comando ni registrar otra versión; se conservó la
+instalación global. El instalador es herramienta de desarrollo, no dependencia
+de producción de Nexo.
 Fuente: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill/blob/main/README.md
 
 Usa Impeccable para el trabajo UI del momento y Ponytail para simplificar
@@ -49,11 +54,32 @@ Cuenta el total de principal y agentes. Caché y razonamiento pueden estar
 incluidos en entrada/salida; evita sumar subconjuntos dos veces.
 No cambies la aceptación para reducir la cifra.
 
+### Resultado de comprobación local — 3 de octubre de 2026
+`.codex/config.toml` y cuatro archivos `.codex/agents/*.toml` están presentes;
+Python `tomllib` validó sintaxis y modelos configurados. El cliente de esta tarea
+ejecutó una revisión independiente con `gpt-6-sol`; la documentación oficial y
+el plan Plus indican disponibilidad de Luna/Sol, aunque no prueban acceso desde
+otro perfil local.
+
+`codex doctor` corrió con CLI 0.142.0 en el perfil aislado
+`C:\Users\CodexSandboxOffline\.codex`, informó falta de credenciales y problemas
+de conexión. No confirma si ese CLI cargó los agentes del proyecto. La carga de
+configuración y agentes en una sesión nueva del perfil principal queda por
+confirmar allí; la limitación se debe al entorno aislado observado, no a TOML
+inválido. No se alteró ni actualizó ese perfil.
+
+La skill UI UX Pro Max ya estaba instalada globalmente en el perfil del usuario;
+no se creó copia local ni se reemplazó ninguna personalización. El panel de uso
+muestra porcentajes agregados, no tokens de esta tarea. Consumo atribuible: N/D.
+
 ## Validación del paquete
 Se comprobó sintaxis TOML con Python tomllib, campos documentados, roles/modelos,
 límite de dos subagentes, integridad del ZIP y conservación de 163 RF y 75 RNF.
-La prueba completa de carga, acceso a modelos e instalación de skills se realiza
-en tu cliente: Codex CLI no está disponible en el entorno que generó el paquete.
+El 3 de octubre se comprobó el CLI 0.142.0 en un perfil aislado sin credenciales
+ni conectividad. Su catálogo local no incluye GPT-6 Luna/Sol y no confirma la
+carga de estos agentes desde el perfil principal. La revisión `gpt-6-sol` y las
+skills disponibles se verificaron en la sesión Codex actual; la carga del `.codex`
+local debe confirmarse en una nueva sesión principal autenticada.
 
 Fuentes:
 - https://learn.chatgpt.com/docs/models?surface=app

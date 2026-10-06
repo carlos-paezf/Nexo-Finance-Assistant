@@ -1,15 +1,15 @@
 # 10 — Evaluación de tecnología móvil
 
-**Recomendación provisional — 2 de octubre de 2026. DEC-004 sigue pendiente.**
+**Base confirmada por el usuario — 5 de octubre de 2026. Validación técnica pendiente.**
 Requisitos: RF-016, RF-018, RF-026 a RF-038; RNF-006, RNF-018, RNF-020 a RNF-025, RNF-051, RNF-057, RNF-059 a RNF-061.
 
 ## Recomendación
 
-Usar **Flutter como primera candidata para la prueba de concepto** del núcleo móvil offline y los adaptadores nativos de captura Android. Es una recomendación de evaluación: la documentación oficial ofrece patrones de datos locales/remotos y canales hacia código de plataforma. No prueba que sea más rápido, barato o seguro que Ionic.
+La primera versión será para **Android** y la base seleccionada es **Flutter** para móvil, **NestJS con TypeScript** para backend y **PostgreSQL con Prisma** para persistencia/acceso a datos. Se conserva la comparación con Ionic como antecedente, no como alternativa activa salvo nueva evidencia o instrucción. Esta decisión confirma plataforma y tecnologías, no versiones productivas ni validación técnica completa. La documentación oficial ofrece patrones de datos locales/remotos y canales hacia código de plataforma; no demuestra por sí sola rendimiento, costo o seguridad.
 
 Si el equipo ya domina Angular/TypeScript y puede mantener adaptadores Kotlin/Swift, **Ionic + Angular + Capacitor** es una alternativa igualmente viable que puede reducir aprendizaje. No se conoce la experiencia del equipo ni se han medido tiempos. El portal web independiente no obliga a compartir framework con móvil.
 
-No se ha elegido versión, plugin de base de datos, backend o proveedor. No se instalan dependencias en esta tarea.
+El usuario confirmó esta base tecnológica y Android. Las versiones concretas, compatibilidad integral, dependencias productivas y validación técnica/productiva permanecen pendientes; la evidencia T-005 no valida por sí sola despliegue ni operación productiva.
 
 ## Comparación basada en requisitos
 
@@ -19,7 +19,7 @@ No se ha elegido versión, plugin de base de datos, backend o proveedor. No se i
 | Captura Android: RF-027/RF-028 | Canales de plataforma conectan Dart con código Android/iOS [F2]. | Plugins Android integran SDKs desde Java/Kotlin [C1]. | Ambos pueden envolver el mismo servicio nativo; ninguno garantiza acceso a contenido bancario. |
 | Segundo plano: RNF-018/RNF-020 | Procesos en segundo plano mediante isolates y mecanismos de plataforma [F3]. | Background Runner documenta límites del sistema y frecuencia no garantizada [C2]. | Sincronizar al abrir/reanudar y recuperar conectividad; no prometer captura ni sincronización continua. |
 | Datos sensibles: RNF-002/RNF-006 | Elegir almacenamiento protegido y validar plugins. | Igual requisito; no asumir que preferencias o almacenamiento web basten para datos financieros. | Exigir PoC de persistencia, cierre de sesión y aislamiento entre usuarios. |
-| Equipo y portal | Añade Dart si el equipo no lo conoce; el portal mantiene decisión propia. | Posible reutilización de conocimientos TypeScript/Angular si existen. | Inferencia de coste de mantenimiento, no evidencia medida. Confirmar experiencia antes de decidir. |
+| Equipo y portal | Añade Dart si el equipo no lo conoce; el portal mantiene decisión propia. | Posible reutilización de conocimientos TypeScript/Angular si existen. | Base Flutter confirmada; experiencia del equipo y coste de mantenimiento siguen sin medirse. |
 | Android/iOS: RNF-057/RNF-061 | Sujeto a permisos y APIs nativas. | Sujeto a los mismos permisos y APIs nativas. | El framework no elimina diferencias de capacidad entre plataformas. |
 
 [F1] [Flutter: Offline-first support](https://docs.flutter.dev/app-architecture/design-patterns/offline-first).
@@ -71,7 +71,41 @@ Usar datos sintéticos y un Android físico y un iPhone físico; registrar versi
 | Seguridad | Tokens y caché protegidos, cambio de usuario aislado, permiso revocado rechazado al sincronizar. | Pruebas negativas de CA-I1-07/11 y CA-I2-06. |
 | Paridad útil iOS | Registro manual, persistencia y reanudación funcionan aun sin captura de alertas externas. | Evidencia en iPhone físico; no simular equivalencia de conectores. |
 
-Comenzar con Flutter si no hay preferencia técnica informada; contrastar Ionic si hay experiencia web existente o la PoC revela coste excesivo. Elegir según requisitos críticos superados y coste real de mantener almacenamiento/conectores, no por una puntuación inventada. Si ningún candidato cumple, revisar la arquitectura o el alcance antes de aprobar DEC-004.
+Continuar T-005 sobre la base Flutter/NestJS-TypeScript/PostgreSQL-Prisma y plataforma Android confirmadas. Contrastar resultados con requisitos críticos y costo real de almacenamiento/conectores, no con una puntuación inventada. Si la validación encuentra bloqueos, documentar evidencia y proponer ajuste antes de fijar versiones productivas.
 
-**Estado:** investigación documental realizada; ninguna PoC, prueba de rendimiento ni validación con bancos ejecutada.
+## Resultado parcial de T-005 — ejecución Windows
+
+La preferencia tecnológica del usuario es Flutter + NestJS/TypeScript + PostgreSQL/Prisma. PoC: Flutter almacena movimientos y cola en archivo local con centavos enteros; el API valida claves/payload y persiste `BIGINT` mediante Prisma. Se generó target Windows para verificación. Se eligió Windows porque Build Tools 2019 y SDK Windows estaban disponibles; Flutter no encontró Android SDK ni dispositivos Android.
+
+**Entorno y pruebas reales:** Windows 11, Flutter 3.47.5/Dart 3.13.4, VS Build Tools 2019, Node 22.15.0/npm 10.9.2, Nest 12.1.2, TypeScript 5.9.3, Prisma 7.10.0, PostgreSQL 17.6 aislado en `poc/.runtime` puerto 55432. `flutter doctor -v` marcó Windows como listo y Android toolchain sin SDK; `flutter devices` listó Windows, Chrome y Edge. `flutter pub get --enforce-lockfile` pasó, manteniendo las versiones previas del lockfile y añadiendo el SDK `integration_test`; `flutter analyze` no encontró issues y `flutter test` pasó 5/5, incluida recuperación de 100 movimientos, reapertura de almacenamiento y retry sin duplicado.
+
+`npm run db:deploy` aplicó la migración existente. `npm test` contra PostgreSQL real pasó 5/5: cuatro pruebas de servicio más integración HTTP con NestJS; esta crea cuenta, reintenta ingreso/gasto diez veces, confirma saldo `10765433` centavos, reinicia el proceso API, vuelve a reintentar, verifica un único efecto por movimiento y recibe HTTP 409 al reutilizar el ID con otro importe. `npm audit` reportó 0 vulnerabilidades.
+
+La prueba `flutter test integration_test/finance_flow_test.dart -d windows --dart-define=NEXO_API_URL=http://127.0.0.1:3000` pasó 1/1 sobre la app desktop real: crear cuenta de COP 1.000,00, ingreso COP 200,00 y gasto COP 12,34; saldo COP 1.187,66; API caída y error visible; persistencia y rehidratación tras recrear el árbol de app; luego inicia API real, sincroniza cuenta/movimientos y confirma saldo. El test no mata/reinicia el ejecutable UI entero. La app también se compiló y quedó disponible para inspección local.
+
+### Iteración adicional — 5 de octubre de 2026
+
+El contrato local ahora refleja límites de API (ID ASCII 1–80, nombre 1–80,
+descripción 1–200, valores exactos hasta PostgreSQL `BIGINT`) y bloquea entradas
+inválidas antes de incorporarlas a la cola. HTTP 400/409 se clasifican como
+rechazo con causa retenida y sin replay automático; transporte/servidor quedan
+reintentables. Se puede corregir un movimiento y reencolarlo con ID nuevo.
+Prueba UI Windows 1/1 con 409 real, causa visible, corrección y saldo exacto.
+
+El harness `poc/flutter_offline/tool/verify_windows_restart.ps1` valida el
+proceso Windows Release entero: app abre offline desde archivo sintético,
+proceso terminado, API/PostgreSQL reactivados, proceso relanzado y cola
+reproducida. Confirmó dos movimientos y saldo `1122500` centavos; otro
+relanzamiento conservó dos filas. Evidencia de procesos en archivo local
+ignorado `poc/.runtime/windows-restart-validation.log`. API 3011 y última ventana
+desktop quedaron disponibles. `flutter test`: 10/10; `flutter analyze`: limpio;
+`npm test` PostgreSQL real: 5/5.
+
+T-005 permanece en progreso: experimentos físicos Android/iOS, captura nativa,
+permisos, auth/cifrado, segundo plano, batería, rendimiento y criterios T-008
+siguen pendientes. El stack productivo, versiones, DEC-004 y MVP no se aprueban.
+
+Cobertura parcial: RF-016/018, CA-I1-02 y RNF-020 a RNF-025 como flujo sintético; no sustituye criterio de rendimiento o disponibilidad productiva. Permanecen pendientes reinicio del proceso app, prueba física Android/iOS, captura por plataforma, permisos, privacidad por usuario, auth/cifrado, segundo plano, energía, rendimiento, transferencias/acuerdos compartidos. No usar datos reales.
+
+**Recomendación actualizada:** la base Flutter + NestJS/TypeScript + PostgreSQL/Prisma y Android primera versión están confirmados por el usuario. Continuar T-005 para validar técnicamente esa base; ya se compilaron Flutter Windows y Nest, se ejercitó persistencia real y se verificó offline/replay en integración GUI. La evidencia no valida Android físico, conectores, seguridad ni costo del equipo. Las versiones productivas y la aprobación formal del MVP siguen pendientes.
 

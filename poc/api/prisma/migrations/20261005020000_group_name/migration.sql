@@ -1,0 +1,2 @@
+ALTER TABLE "Group"
+ADD COLUMN "name" VARCHAR(80) NOT NULL DEFAULT 'Grupo existente';

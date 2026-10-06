@@ -59,7 +59,7 @@ Los logs y archivos grandes se conservan como evidencias con enlace; no se vuelc
 | --- | --- | --- |
 | Ponytail | Disponible en esta sesión | Simplicidad en implementación y correcciones; conservar validación, seguridad, accesibilidad y pruebas necesarias. |
 | Impeccable | Disponible en esta sesión | Flujos, interfaz y revisión visual; cargar solo el playbook aplicable y limitar las rondas de inspección. |
-| UI UX Pro Max | Fuente e instalación para Codex verificadas; pendiente en el proyecto local | Complemento para referencias y sistema visual inicial; evitar repetir su generación en cada pantalla. |
+| UI UX Pro Max | Disponible en esta sesión e instalada globalmente en `C:\Users\cpaez\.agents\skills\ui-ux-pro-max`; sin copia en el proyecto | Complemento para referencias y sistema visual inicial; preservar sus personalizaciones y evitar repetir su generación en cada pantalla. |
 | Notion | Conectado en esta sesión | Requisitos, decisiones y estado; leer y actualizar solo las páginas pertinentes. |
 | OpenAI Docs | Disponible en esta sesión | Verificar configuración, modelos e integración OpenAI cuando la tarea lo necesite. |
 
@@ -67,7 +67,7 @@ Los logs y archivos grandes se conservan como evidencias con enlace; no se vuelc
 Ponytail rige las decisiones de implementación. Impeccable rige la ejecución de UX/UI. UI UX Pro Max complementa la selección inicial de referencias; un sistema visual acordado prevalece sobre nuevas sugerencias genéricas.
 Una modificación menor no activa una cadena completa de auditoría, rediseño y optimización. Seleccionar el flujo pertinente.
 No añadir proveedores, plugins o dependencias solo por estar disponibles. Verificar compatibilidad con el stack elegido y beneficio concreto.
-No se ha inspeccionado ni modificado el proyecto local del usuario. Disponibilidad en esta sesión no prueba instalación en otra instancia.
+Comprobación del 3 de octubre: `.codex/config.toml` y cuatro agentes existen y pasan validación TOML. Ponytail, Impeccable y UI UX Pro Max están disponibles en esta sesión. La última también tiene `SKILL.md`, datos y scripts en el perfil del usuario; no se repitió su instalación ni se modificó esa carpeta.
 ## Aplicación a Codex local
 El paquete contiene un bloque de configuración de proyecto y cuatro archivos de agentes personalizados. Combinarlos con la configuración existente sin perder servidores MCP o instrucciones.
 Codex actual utiliza archivos TOML independientes en `.codex/agents/`, con name, description y developer_instructions. La configuración de proyecto se carga en proyectos de confianza.
