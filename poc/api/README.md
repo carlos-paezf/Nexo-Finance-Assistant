@@ -1,12 +1,12 @@
 # Nexo — API NestJS/Prisma de PoC
 
-API sin autenticación para datos sintéticos. No exponer a Internet ni usar con datos reales. La preferencia tecnológica de Nexo no aprueba esta versión ni el stack de producción.
+API experimental para datos sintéticos: los endpoints financieros continúan sin autenticación; el flujo de sesión y grupos está protegido. No exponer a Internet ni usar con datos reales. La preferencia tecnológica de Nexo no aprueba esta versión ni el stack de producción.
 
 ## Requisitos y versiones de esta PoC
 
 - Node `22.15.0` del entorno: compatible con NestJS `12.1.2` (Node >=20) y Prisma ORM `7.10.0` (Node `^20.19 || ^22.12 || >=24`).
 - TypeScript `5.9.3`; Compose ofrece PostgreSQL `18`. La validación ejecutada usó PostgreSQL `17.6` en un clúster local aislado, compatible con Prisma.
-- Cliente móvil: Flutter `3.47.5`, Dart `3.13.4`; Windows desktop seleccionado. `path_provider` `2.1.6` quedó bloqueado en `pubspec.lock`.
+- Cliente móvil: Flutter `3.47.6`, Dart `3.13.5` ejecutados en Windows para esta iteración; `path_provider` `2.1.6` quedó bloqueado en `pubspec.lock`.
 - Las versiones fijadas son para reproducir esta PoC; versiones de producción y aprobación de DEC-004 siguen pendientes.
 
 ## Comandos
@@ -46,7 +46,9 @@ versiona. No imprimir ni copiar sus credenciales a logs.
 - `GET /accounts/:id`: detalle, movimientos y `balanceCents`.
 - Los IDs estables son las claves únicas. Payload repetido devuelve el registro original; misma clave con distinto contenido devuelve HTTP 409. Importes viajan como strings de centavos y se guardan como PostgreSQL `BIGINT`/`BigInt`.
 
-Los endpoints financieros existentes continúan sin autenticación. El nuevo flujo experimental añade registro/sesión y autoriza únicamente `PATCH /groups/:groupId/mode`; no habilita autenticación financiera integral, invitaciones, transferencias ni acuerdos compartidos. La integración probada fue en PostgreSQL local dedicado a la PoC; no usar datos reales.
+Los endpoints financieros existentes continúan sin autenticación. El flujo experimental de grupo añade `POST /groups` y `GET /groups`, ambos protegidos por Bearer: crea UUID en servidor y membresía activa del creador con `canChangeMode`; lista solo grupos del actor activo y devuelve revisión decimal. El body de creación acepta solo `name` (1–80 caracteres) y `type` (`PAREJA` o `FAMILIA`); rechaza IDs, miembros y permisos del cliente. La columna `name` se añadió aditivamente y registros anteriores reciben el nombre sintético `Grupo existente`. El modelo usa un creador inicial; invitaciones e incorporación de miembros siguen pendientes. El cambio autenticado sigue en `PATCH /groups/:groupId/mode`; el permiso presentado por Flutter solo controla la UI y el backend vuelve a autorizar desde PostgreSQL.
+
+Este flujo no habilita autenticación financiera integral, invitaciones, transferencias ni acuerdos compartidos. La integración probada fue en PostgreSQL local dedicado a la PoC; no usar datos reales.
 
 ## Identidad y sesiones — laboratorio
 

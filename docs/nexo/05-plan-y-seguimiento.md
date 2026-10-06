@@ -381,3 +381,43 @@ Cobertura parcial de RF-001/RF-002/RF-008. Siguen pendientes recuperación y
 verificación de correo, recuperación de contraseña, TLS, límites compartidos
 entre procesos, expiración/purga operacional, autenticación de endpoints
 financieros, integración Flutter/Android y validación completa de T-005.
+
+## Seguimiento T-005 — pantalla Flutter de sesión y grupos — 5 de octubre de 2026
+
+Se aplicó `20261005020000_group_name` de forma aditiva en PostgreSQL sintético;
+las filas previas conservan sus IDs y reciben un nombre provisional. `POST
+/groups` valida nombre/tipo y crea grupo + membresía activa del usuario autenticado
+en una escritura; `GET /groups` solo devuelve grupos con membresía activa.
+Flutter incorpora registro/login/logout, lista y creación Pareja/Familia, cambio
+bilateral con confirmación, clave idempotente estable en reintentos y consulta
+después de un 409. La sesión queda en memoria y los grupos no usan la cola
+offline financiera. El laboratorio conserva el supuesto experimental de un
+creador inicial y no incorpora invitaciones.
+
+Resultados comprobados:
+
+- `npm test`: 39/39, 0 fallos y 0 omitidas; build NestJS/Prisma y pruebas HTTP,
+  política y persistencia contra PostgreSQL real.
+- `flutter analyze`: sin issues. `flutter test`: 22/22; incluye escala/accesibilidad,
+  errores visibles, cambio de usuario, reintento de modo con igual clave/payload,
+  desmontaje durante registro/creación/logout y bloqueo de logout mientras se
+  actualiza la lista.
+- `flutter test integration_test/auth_groups_flow_test.dart -d windows`: 1/1.
+  El harness de puerto libre levantó API real y Postgres; registro, login, dos
+  creaciones, ambas migraciones desde los controles visuales, consulta de
+  revisiones y logout pasaron. Limpió fixtures propios.
+- Revisión independiente Sol sobre el diff de permisos/sesión: sin hallazgos
+  bloqueantes después de corregir respuestas tardías, lifecycle de formularios y
+  limpieza de errores.
+
+Se dejan API y ventana Windows Debug abiertas. API `127.0.0.1:3023` PID 97124;
+ventana PID 2416; Release financiero anterior PID 95952 se conservó. Directorio
+sintético independiente:
+`D:\Nexus\poc\.runtime\t005-auth-groups-20261005`. Comandos exactos de arranque
+e integración documentados en `poc/flutter_offline/README.md`.
+
+Cobertura parcial RF-001/RF-002/RF-008. No se ha implementado autenticación
+financiera, almacenamiento seguro de token, verificación/recuperación de correo,
+TLS, invitaciones ni miembros adicionales; no hay sincronización offline de
+grupos. Windows no valida Android. Reglas de producción, límites de versión y
+aceptación del MVP siguen pendientes; T-005 continúa en progreso.

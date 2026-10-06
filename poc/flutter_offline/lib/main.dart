@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'api_client.dart';
+import 'auth_groups_page.dart';
 import 'local_data.dart';
 import 'money.dart';
 import 'privacy_use_page.dart';
@@ -191,6 +192,19 @@ class _LedgerPageState extends State<LedgerPage> {
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
                 builder: (_) => const PrivacyUsePage(),
+              ),
+            ),
+          ),
+          IconButton(
+            tooltip: 'Grupos',
+            icon: const Icon(Icons.groups_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => AuthGroupsPage(
+                  apiBaseUrl: widget.apiBaseUrl ??
+                      const String.fromEnvironment('NEXO_API_URL',
+                          defaultValue: 'http://127.0.0.1:3000'),
+                ),
               ),
             ),
           ),

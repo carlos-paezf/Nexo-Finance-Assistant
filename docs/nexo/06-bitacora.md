@@ -470,3 +470,37 @@ RF-001, RF-002 y RF-008 reciben cobertura experimental parcial. No se valida
 recuperación/verificación de correo, Flutter ni Android, autenticación financiera
 integral, TLS ni despliegue. Los límites de intentos y hash son por proceso; las
 sesiones no tienen purga operacional. T-005 permanece en progreso.
+
+## 5 de octubre de 2026 — UI de sesión y grupos en Flutter
+
+La migración aditiva `20261005020000_group_name` incorporó el nombre de grupo
+sin reset. La API autenticada permite creación atómica de grupo y membresía
+inicial del actor, y consulta aislada por membresía activa; identidad, integrantes
+y permisos adicionales en el body se rechazan. Flutter añadió cliente HTTP y una
+pantalla de registro/login, creación/lista de Pareja/Familia y confirmación de
+cambios de modo. Bearer permanece en memoria; el ledger conserva sus límites y
+no agrega grupos a la cola offline.
+
+Verificación: `npm test` 39/39 (0 omitidas, PostgreSQL real); `flutter analyze`
+sin issues; `flutter test` 22/22; integración Windows 1/1. Esta última recorrió
+registro visual, login, creación de dos grupos, migración bilateral iniciada por
+los botones de la interfaz, lectura de tipo/revisión persistidos y logout. El
+arreglo de lifecycle evita tocar controllers tras desmontaje; el refresh
+serializa la lista frente a cambio de sesión. Revisión independiente Sol no
+encontró defectos bloqueantes. Los tests Flutter son automatizados; la ventana
+Windows queda disponible para revisión manual, no se afirma validación Android.
+
+API de laboratorio: `127.0.0.1:3023` (PID 97124), respuesta controlada 404
+verificada para cuenta inexistente; usa PostgreSQL sintético ya dedicado. La
+ventana Flutter Windows Debug está abierta (PID 2416), con URL compilada
+`http://127.0.0.1:3023` y datos separados en
+`D:\Nexus\poc\.runtime\t005-auth-groups-20261005`. Se conservó la ventana
+Release financiera existente (PID 95952). README de Flutter guarda el comando de
+arranque y el comando exacto del harness; este último reserva su propio puerto y
+no opera el API persistente.
+
+El modelo experimental comienza con un único creador autorizado. No implementa
+invitar/añadir miembros, autorización financiera, token cifrado en almacenamiento
+seguro, recuperación/verificación de cuenta, TLS ni grupos offline. Versiones
+productivas y Android siguen pendientes. RF-001/002/008 son cobertura parcial;
+T-005 no se cierra.

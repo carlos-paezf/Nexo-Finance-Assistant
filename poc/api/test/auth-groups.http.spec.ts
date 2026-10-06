@@ -61,6 +61,7 @@ test('HTTP + PostgreSQL: credenciales, sesiones y cambio de modo persisten sin i
   const password = '  Clave sintética 123!  ';
   const groupId = randomUUID();
   const externalGroupId = randomUUID();
+  let createdGroupId = '';
   const legacyMemberId = randomUUID();
   let child: ChildProcess | undefined;
   let auth: Authentication;
@@ -148,6 +149,41 @@ test('HTTP + PostgreSQL: credenciales, sesiones y cambio de modo persisten sin i
       await prisma.group.create({ data: { id: externalGroupId, type: 'PAREJA', memberships: {
         create: { userId: external.user.id, active: true, canChangeMode: true },
       } } });
+    });
+
+    await t.test('crear y listar grupos deriva identidad, permisos y visibilidad de la sesión', async () => {
+      assert.equal((await call('/groups', 'POST', { name: 'Sin sesión', type: 'PAREJA' })).status, 401);
+      assert.equal((await call('/groups', 'GET')).status, 401);
+      for (const body of [
+        { name: 'Inválido', type: 'PAREJA', id: randomUUID() },
+        { name: 'Inválido', type: 'PAREJA', members: [] },
+        { name: 'Inválido', type: 'PAREJA', canChangeMode: false },
+        { name: 'Inválido', type: 'PAREJA', userId: external.user.id },
+        { name: '', type: 'FAMILIA' },
+        { name: 'V'.repeat(81), type: 'FAMILIA' },
+        { name: 'Tipo inválido', type: 'AMIGOS' },
+      ]) assert.equal((await call('/groups', 'POST', body, auth.token)).status, 400);
+
+      const response = await call('/groups', 'POST', { name: '  Grupo de prueba  ', type: 'PAREJA' }, auth.token);
+      assert.equal(response.status, 201);
+      const created = await response.json() as { id: string; name: string; type: string; revision: string; canChangeMode: boolean };
+      createdGroupId = created.id;
+      assert.match(createdGroupId, /^[0-9a-f-]{36}$/);
+      assert.deepEqual(created, { id: createdGroupId, name: 'Grupo de prueba', type: 'PAREJA', revision: '0', canChangeMode: true });
+      const membership = await prisma.groupMembership.findUniqueOrThrow({
+        where: { groupId_userId: { groupId: createdGroupId, userId: auth.user.id } },
+      });
+      assert.equal(membership.active, true);
+      assert.equal(membership.canChangeMode, true);
+
+      const own = await call('/groups', 'GET', undefined, auth.token);
+      assert.equal(own.status, 200);
+      assert.deepEqual(await own.json(), [created]);
+      const other = await call('/groups', 'GET', undefined, external.token);
+      assert.equal(other.status, 200);
+      const otherGroups = await other.json() as Array<{ id: string }>;
+      assert.deepEqual(otherGroups.map((group) => group.id), [externalGroupId]);
+      assert.equal(otherGroups.some((group) => group.id === createdGroupId), false);
     });
 
     await t.test('Bearer ausente, inválido, caducado, revocado y en URL se rechazan', async () => {
@@ -242,7 +278,7 @@ test('HTTP + PostgreSQL: credenciales, sesiones y cambio de modo persisten sin i
   } finally {
     if (child) await stopApi(child);
     try {
-      await prisma.group.deleteMany({ where: { id: { in: [groupId, externalGroupId] } } });
+      await prisma.group.deleteMany({ where: { id: { in: [groupId, externalGroupId, ...(createdGroupId ? [createdGroupId] : [])] } } });
       await prisma.user.deleteMany({ where: { email: { in: [email, externalEmail] } } });
     } finally {
       await prisma.onModuleDestroy();

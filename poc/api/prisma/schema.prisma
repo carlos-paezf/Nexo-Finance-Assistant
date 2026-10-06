@@ -62,6 +62,7 @@ model AuthSession {
 
 model Group {
   id          String               @id @db.Uuid
+  name        String               @default("Grupo existente") @db.VarChar(80)
   type        GroupMode
   revision    BigInt               @default(0)
   memberships GroupMembership[]

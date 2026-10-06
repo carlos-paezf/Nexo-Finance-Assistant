@@ -117,3 +117,38 @@ subpruebas persistentes anteriores siguen pasando. Solo `PATCH
 financieros continúan sin autenticar; no se demuestra autorización integral,
 verificación de correo, recuperación, TLS ni validación Flutter/Android. RF-001,
 RF-002 y RF-008 tienen cobertura experimental parcial; T-005 sigue abierto.
+
+### Grupos HTTP y cliente Flutter — experimento de sesión — 5 de octubre de 2026
+
+La migración aditiva `20261005020000_group_name` añade nombre de 1–80
+caracteres a `Group` con valor sintético para filas existentes. `POST /groups`
+crea UUID de servidor y membresía activa del creador con `canChangeMode` dentro
+de una escritura anidada atómica; acepta solo nombre y tipo explícitos y rechaza
+identidad, miembros o permisos del cliente. `GET /groups` filtra por membresía
+activa del actor autenticado y expone metadata mínima y revisión decimal. Es un
+experimento de creador único; invitaciones y miembros adicionales no están
+implementados. `PATCH /groups/:groupId/mode` sigue consultando el permiso vigente
+en PostgreSQL. Flutter mantiene Bearer en memoria y el AppBar abre la página
+«Grupos» sin incorporar grupos a la cola financiera.
+
+La suite `npm test` pasó 39/39 sin skips contra PostgreSQL real, incluyendo
+pruebas HTTP de creación/listado, aislamiento entre dos usuarios y rechazo de
+campos falsificados. `flutter analyze` no reportó problemas; `flutter test` pasó
+22/22. La integración `integration_test/auth_groups_flow_test.dart -d windows`
+pasó 1/1 con API NestJS y PostgreSQL reales: registro en la pantalla, inicio de
+sesión, creación de ambos tipos, cambios bilaterales desde los controles de UI,
+consulta de revisiones y logout. Una revisión independiente Sol de sesión y
+permisos confirmó que el refresh serializado bloquea cambio de sesión concurrente,
+que se verifica `mounted` antes de usar formularios y que el error de modo se
+limpia al reintentar; pruebas nuevas cubren desmontaje durante registro/creación/
+logout y aislamiento de listas al cambiar de usuario.
+
+El runtime de inspección queda en Windows Debug con API loopback `127.0.0.1:3023`
+y directorio local sintético independiente
+`poc/.runtime/t005-auth-groups-20261005`; los comandos reproducibles están en el
+README de la PoC Flutter. La ventana Release financiera previa se conservó.
+Esto no valida Android ni hardware móvil, almacenamiento seguro de token,
+autenticación financiera, verificación/recuperación de cuenta, TLS, invitaciones,
+miembros múltiples, grupos offline ni reglas productivas/históricos. La cuenta
+del test visual es sintética y sus fixtures PostgreSQL se limpian al terminar.
+RF-001/RF-002/RF-008 tienen cobertura parcial; T-005 permanece en progreso.
